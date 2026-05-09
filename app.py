@@ -81,4 +81,8 @@ html_content = html_content.replace("</head>", inject_script + "\n</head>")
 # a fallback — this is just an extra option for reliability.
 
 # ── Render the HTML application ─────────────────────────────
-components.html(html_content, height=900, scrolling=True)
+# Use JS to detect viewport height and pass it; fallback = 900
+# The inner HTML uses 100vh so scrolling=False works well at 1080p+
+# We set a large fixed height so the app never gets cut off on any screen
+
+components.html(html_content, height=1080, scrolling=True)

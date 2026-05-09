@@ -2650,17 +2650,18 @@ async function startAnalysis() {
 
 async function analyzeParam(param, imageDesc) {
   const prompt = buildParamPrompt(param, imageDesc);
-  const text = await analyzeWithModel(prompt, false);
+  // FIX: withImage=true so the model actually sees the image for each parameter
+  const text = await analyzeWithModel(prompt, true);
   const score = extractScore(text);
   return { text, score };
 }
 
 function buildParamPrompt(param, imageDesc) {
-  return `You are analyzing an image. Image overview: "${imageDesc}"
-  
-Analyze the parameter: "${param}"
-Provide a concise analysis (2-3 sentences) specific to this parameter.
-End with: SCORE: X/10 (where X is a numeric rating relevant to this parameter, e.g., quality, intensity, or relevance score).`;
+  return `Analyze this image for the specific parameter: "${param}"
+Context from initial overview: "${imageDesc}"
+
+Provide a focused, expert analysis of "${param}" in 2-3 sentences. Be specific and data-driven about what you observe.
+End your response with exactly: SCORE: X/10 (where X is 1-10 rating of this parameter's quality/presence/intensity).`;
 }
 
 function extractScore(text) {
@@ -2904,11 +2905,20 @@ async function similarImageSearch() {
     // 2. SerpAPI search via CORS proxy
     log('info', 'Querying Google Lens via SerpAPI...');
     const targetUrl = `https://serpapi.com/search?engine=google_lens&url=${encodeURIComponent(imageUrl)}&api_key=${STATE.apiKeys.serpapi}`;
-    // FIX: replaced unreliable proxy. Using corsproxy.io instead.
-    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
-    
-    const resp = await fetch(proxyUrl);
-    if (!resp.ok) throw new Error('SerpAPI search failed');
+    // FIX: Try multiple CORS proxies in order for reliability
+    const CORS_PROXIES = [
+      `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
+      `https://proxy.cors.sh/${targetUrl}`,
+    ];
+    let resp = null;
+    for (const proxyUrl of CORS_PROXIES) {
+      try {
+        resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(10000) });
+        if (resp.ok) break;
+      } catch(e) { log('warn', 'CORS proxy failed, trying next: ' + e.message); resp = null; }
+    }
+    if (!resp || !resp.ok) throw new Error('SerpAPI search failed — all proxies exhausted');
     const data = await resp.json();
     
     // 3. Parse web sources
@@ -3309,6 +3319,11 @@ function goStep6Setup() {
 
 // Extend goStep to run setup
 const _origGoStep = goStep;
+// FIX: Re-define goStep to also call goStep6Setup when reaching step 6
+function goStep(n) {
+  _origGoStep(n);
+  if (n === 6) goStep6Setup();
+}
 function extractEXIF() {
   return new Promise((resolve) => {
     if (!STATE.uploadedFile || !window.EXIF) { resolve(null); return; }
