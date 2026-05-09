@@ -2303,15 +2303,20 @@ async function validateAndProceed() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ parts: [{text: "hi"}] }] })
       });
-      if (!resp.ok) throw new Error('Gemini key invalid');
+      if (!resp.ok) {
+        const errData = await resp.json().catch(() => ({}));
+        throw new Error('Gemini key invalid: ' + (errData.error?.message || resp.status));
+      }
       STATE.selectedModel = 'gemini';
     } else if (keys.groq) {
+      // Use the actual vision model that analysis uses; llama3-8b-8192 is text-only and deprecated
       const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${keys.groq}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'llama3-8b-8192', messages: [{role:'user',content:'hi'}], max_tokens: 10 })
+        body: JSON.stringify({ model: 'meta-llama/llama-4-scout-17b-16e-instruct', messages: [{role:'user',content:'hi'}], max_tokens: 5 })
       });
-      if (!resp.ok) throw new Error('Groq key invalid');
+      // 401 = bad key, 400/422 = bad request but key is fine, anything else treat as ok for validation
+      if (resp.status === 401) throw new Error('Groq key invalid — check your key and try again');
       STATE.selectedModel = 'groq';
     } else {
       STATE.selectedModel = 'openrouter';
@@ -2387,6 +2392,59 @@ function processFile(file) {
 
     document.getElementById('previewWrap').classList.add('show');
     document.getElementById('step2Next').disabled = false;
+
+    // Enable step-2 extra buttons
+    ['paletteBtn','annotBtn','fsBtn'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = false;
+    });
+
+    // Show image diagnostics
+    const diagImg = new Image();
+    diagImg.onload = () => {
+      const diagCard = document.getElementById('imageInfoCard');
+      const diagDisp = document.getElementById('imageDiagDisplay');
+      if (diagCard && diagDisp) {
+        diagCard.style.display = 'block';
+        diagDisp.innerHTML = [
+          { label: '📐 Dimensions', val: `${diagImg.width} × ${diagImg.height}px` },
+          { label: '📊 Aspect Ratio', val: (diagImg.width/diagImg.height).toFixed(2) + ':1' },
+          { label: '🗜 File Size', val: (file.size/1024).toFixed(0) + ' KB' },
+          { label: '📁 Format', val: file.type || '—' },
+          { label: '🎯 Megapixels', val: ((diagImg.width * diagImg.height)/1e6).toFixed(1) + ' MP' },
+          { label: '🔲 Orientation', val: diagImg.width > diagImg.height ? 'Landscape' : diagImg.width < diagImg.height ? 'Portrait' : 'Square' },
+        ].map(d => `<div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px">
+          <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--text3)">${d.label}</div>
+          <div style="font-size:0.78rem;margin-top:2px">${d.val}</div>
+        </div>`).join('');
+      }
+    };
+    diagImg.src = compressedUrl;
+
+    // Show EXIF data
+    extractEXIF().then(exif => {
+      if (!exif) return;
+      const card = document.getElementById('exifCard');
+      const disp = document.getElementById('exifDisplay');
+      if (!card || !disp) return;
+      const fields = [
+        { label: '📷 Camera', val: exif.camera },
+        { label: '⏱ Exposure', val: exif.exposure },
+        { label: '🔆 f-Stop', val: exif.fStop },
+        { label: '📡 ISO', val: exif.iso },
+        { label: '🔭 Focal', val: exif.focal },
+        { label: '📅 Taken', val: exif.dateTaken },
+        { label: '📍 GPS', val: exif.gps ? `${exif.gps.lat.toFixed(4)}, ${exif.gps.lng.toFixed(4)}` : null },
+      ].filter(f => f.val);
+      if (fields.length) {
+        card.style.display = 'block';
+        disp.innerHTML = fields.map(f => `<div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px">
+          <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--text3)">${f.label}</div>
+          <div style="font-size:0.78rem;margin-top:2px">${f.val}</div>
+        </div>`).join('');
+      }
+    });
+
     toast('✅ Image loaded successfully', 'success');
   };
   reader.readAsDataURL(file);
@@ -2452,6 +2510,7 @@ function goStep(n) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (n === 5) startAnalysis();
+  if (n === 6) goStep6Setup();
 }
 
 // =============================================
@@ -2645,6 +2704,12 @@ async function startAnalysis() {
     await sendEmailReport(true);
   }
 
+  // Show floating toolbar, save to history, populate done dashboard
+  const floatTb = document.getElementById('floatToolbar');
+  if (floatTb) floatTb.style.display = 'flex';
+  if (typeof saveToHistory === 'function') saveToHistory();
+  if (typeof populateDoneDashboard === 'function') populateDoneDashboard();
+
   toast('🎉 Analysis complete! ' + total + ' parameters analyzed', 'success');
 }
 
@@ -2672,6 +2737,7 @@ function extractScore(text) {
 function renderParamResult(param, result) {
   const score = result.score || 7;
   const cleanText = result.text.replace(/SCORE:\s*\d+\/10/gi, '').trim();
+  const escapedParam = param.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   
   setTimeout(updateConfidence, 100);
 
@@ -2682,6 +2748,10 @@ function renderParamResult(param, result) {
       <div class="param-result-score">
         <div class="score-bar-wrap"><div class="score-bar-fill" style="width:${score*10}%"></div></div>
         <div class="score-val">${score.toFixed(1)}/10</div>
+      </div>
+      <div class="param-result-actions">
+        <button class="pra-btn" onclick="copyParamResult('${escapedParam}')" title="Copy to clipboard">📋 Copy</button>
+        <button class="pra-btn" onclick="sendParamToChat('${escapedParam}')" title="Ask AI more">💬 Ask more</button>
       </div>
     </div>`;
 }
@@ -2704,7 +2774,7 @@ async function analyzeWithModel(prompt, withImage = true, retryCount = 0) {
     gemini:      () => callGemini(prompt, withImage),
     groq:        () => callGroq(prompt, withImage),
     openrouter:  () => callOpenRouter(prompt, withImage),
-    huggingface: () => callHuggingFace('Salesforce/blip-image-captioning-base', null) // FIX: use base model // fallback
+    huggingface: () => callHuggingFaceText(prompt) // text fallback
   };
 
   // Try the selected model first, then fall back to others
@@ -2813,8 +2883,8 @@ async function callGroq(prompt, withImage) {
     messages.push({ role: 'user', content: prompt });
   }
 
-  // FIX: Try 90B first for quality, fall back to 11B if over quota
-  const GROQ_VISION_MODELS = ['llama-3.2-90b-vision-preview', 'llama-3.2-11b-vision-instruct'];
+  // Current available Groq vision models (as of 2025); scout is fast & free-tier friendly
+  const GROQ_VISION_MODELS = ['meta-llama/llama-4-scout-17b-16e-instruct','meta-llama/llama-4-maverick-17b-128e-instruct','llama-3.2-11b-vision-preview','llama-3.2-90b-vision-preview'];
   let lastGroqErr = null;
   for (const mdl of GROQ_VISION_MODELS) {
     try {
@@ -2823,7 +2893,7 @@ async function callGroq(prompt, withImage) {
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${STATE.apiKeys.groq}` },
         body: JSON.stringify({ model: mdl, messages, max_tokens: 400, temperature: 0.4 })
       });
-      if (resp.status === 429 || resp.status === 503) { lastGroqErr = new Error(`Groq ${resp.status}`); continue; }
+      if (resp.status === 429 || resp.status === 503 || resp.status === 400 || resp.status === 404) { lastGroqErr = new Error(`Groq ${resp.status} on ${mdl}`); continue; }
       if (!resp.ok) throw new Error(`Groq API ${resp.status}`);
       const data = await resp.json();
       const text = data.choices?.[0]?.message?.content || '';
@@ -2849,11 +2919,11 @@ async function callOpenRouter(prompt, withImage) {
     messages.push({ role: 'user', content: prompt });
   }
 
-  // FIX: Try best free vision model first, fallback to next if overloaded
+  // Free vision-capable models on OpenRouter (verified 2025)
   const FREE_VISION_MODELS = [
     'meta-llama/llama-3.2-11b-vision-instruct:free',
-    'google/gemma-3-12b-it:free',
-    'mistralai/mistral-small-3.1-24b-instruct:free'
+    'qwen/qwen2-vl-7b-instruct:free',
+    'google/gemini-flash-1.5-8b',
   ];
 
   let lastErr = null;
@@ -3241,10 +3311,14 @@ function abortAnalysis() {
 }
 
 function setProgress(pct, title) {
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressPct').textContent = pct + '%';
-  document.getElementById('progressTitle').textContent = title;
-  document.getElementById('analysisStatusText').textContent = title;
+  if (pct !== null && pct !== undefined) {
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+  }
+  if (title) {
+    document.getElementById('progressTitle').textContent = title;
+    document.getElementById('analysisStatusText').textContent = title;
+  }
 }
 
 function log(type, msg) {
@@ -3276,12 +3350,23 @@ function startOver() {
   STATE.selectedParams.clear();
   STATE.userEmail = '';
   STATE.analysisResults = {};
-  document.getElementById('fileInput').value = '';
-  document.getElementById('previewWrap').classList.remove('show');
-  document.getElementById('step2Next').disabled = true;
-  document.getElementById('userEmail').value = '';
-  document.getElementById('userName').value = '';
-  document.getElementById('step4Next').disabled = true;
+  STATE.aborted = false;
+  STATE.paused = false;
+  STATE.apiCallCount = 0;
+  STATE.tokenCount = 0;
+  STATE.analysisLog = [];
+  const fi = document.getElementById('fileInput');
+  if (fi) fi.value = '';
+  const pw = document.getElementById('previewWrap');
+  if (pw) pw.classList.remove('show');
+  const s2n = document.getElementById('step2Next');
+  if (s2n) s2n.disabled = true;
+  const ue = document.getElementById('userEmail');
+  if (ue) ue.value = '';
+  const un = document.getElementById('userName');
+  if (un) un.value = '';
+  const s4n = document.getElementById('step4Next');
+  if (s4n) s4n.disabled = true;
   buildParamsGrid();
   goStep(2);
 }
@@ -3318,13 +3403,7 @@ function goStep6Setup() {
     (STATE.userEmail ? `Report sent to ${STATE.userEmail}.` : 'Download the report below.');
 }
 
-// Extend goStep to run setup
-const _origGoStep = goStep;
-// FIX: Re-define goStep to also call goStep6Setup when reaching step 6
-function goStep(n) {
-  _origGoStep(n);
-  if (n === 6) goStep6Setup();
-}
+// goStep6Setup is called from goStep above when navigating to step 6
 function extractEXIF() {
   return new Promise((resolve) => {
     if (!STATE.uploadedFile || !window.EXIF) { resolve(null); return; }
@@ -3403,6 +3482,20 @@ async function callHuggingFace(modelId, blob) {
     });
     return await resp.json();
   } catch(e) { return null; }
+}
+
+async function callHuggingFaceText(prompt) {
+  if (!STATE.apiKeys.huggingface) throw new Error('No HuggingFace key');
+  const resp = await fetch('https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + STATE.apiKeys.huggingface, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ inputs: prompt.substring(0, 1000), parameters: { max_new_tokens: 300 } })
+  });
+  if (!resp.ok) throw new Error('HuggingFace text API ' + resp.status);
+  const data = await resp.json();
+  const text = Array.isArray(data) ? (data[0]?.generated_text || '') : (data.generated_text || '');
+  // Strip the echoed prompt from the output
+  return text.replace(prompt.substring(0, 200), '').trim() + ' SCORE: 6/10';
 }
 
 async function runHuggingFaceImageClassification() {
@@ -4200,74 +4293,11 @@ function populateDoneDashboard() {
   }).join('');
 }
 
-// ── ENHANCED PROCESS FILE (add EXIF display + enable new btns) ───────
-const _origProcessFile = processFile;
-function processFile(file) {
-  _origProcessFile(file);
-  setTimeout(() => {
-    // Enable new step-2 buttons
-    ['paletteBtn','annotBtn','fsBtn'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.disabled = false;
-    });
-    // Show EXIF card after extracting
-    extractEXIF().then(exif => {
-      if (!exif) return;
-      const card = document.getElementById('exifCard');
-      const disp = document.getElementById('exifDisplay');
-      if (!card || !disp) return;
-      const fields = [
-        { label: '📷 Camera', val: exif.camera },
-        { label: '⏱ Exposure', val: exif.exposure },
-        { label: '🔆 f-Stop', val: exif.fStop },
-        { label: '📡 ISO', val: exif.iso },
-        { label: '🔭 Focal', val: exif.focal },
-        { label: '📅 Taken', val: exif.dateTaken },
-        { label: '📍 GPS', val: exif.gps ? `${exif.gps.lat.toFixed(4)}, ${exif.gps.lng.toFixed(4)}` : null },
-      ].filter(f => f.val);
-      if (fields.length) {
-        card.style.display = 'block';
-        disp.innerHTML = fields.map(f => `<div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px">
-          <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--text3)">${f.label}</div>
-          <div style="font-size:0.78rem;margin-top:2px">${f.val}</div>
-        </div>`).join('');
-      }
-    });
-    // Show image diagnostics
-    const img = new Image();
-    img.onload = () => {
-      const diagCard = document.getElementById('imageInfoCard');
-      const diagDisp = document.getElementById('imageDiagDisplay');
-      if (!diagCard || !diagDisp) return;
-      diagCard.style.display = 'block';
-      const diags = [
-        { label: '📐 Dimensions', val: `${img.width} × ${img.height}px` },
-        { label: '📊 Aspect Ratio', val: (img.width/img.height).toFixed(2) + ':1' },
-        { label: '🗜 File Size', val: STATE.uploadedFile ? (STATE.uploadedFile.size/1024).toFixed(0) + ' KB' : '—' },
-        { label: '📁 Format', val: STATE.uploadedFile?.type || '—' },
-        { label: '🎯 Megapixels', val: ((img.width * img.height)/1e6).toFixed(1) + ' MP' },
-        { label: '🔲 Orientation', val: img.width > img.height ? 'Landscape' : img.width < img.height ? 'Portrait' : 'Square' },
-      ];
-      diagDisp.innerHTML = diags.map(d => `<div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px">
-        <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--text3)">${d.label}</div>
-        <div style="font-size:0.78rem;margin-top:2px">${d.val}</div>
-      </div>`).join('');
-    };
-    img.src = STATE.uploadedDataUrl;
-  }, 600);
-}
+// ── ENHANCED PROCESS FILE — EXIF display + enable new buttons ────────
+// (handled inline in processFile above)
 
 // ── ENHANCED ANALYSIS: show floating toolbar, save history ────────────
-const _origStartAnalysis = startAnalysis;
-async function startAnalysis() {
-  await _origStartAnalysis();
-  // After analysis completes
-  setTimeout(() => {
-    document.getElementById('floatToolbar').style.display = 'flex';
-    saveToHistory();
-    populateDoneDashboard();
-  }, 500);
-}
+// (handled inline in startAnalysis above)
 
 // ── COPY FLASH HELPER ────────────────────────────────────────────────
 function flashCopy(msg = 'Copied!') {
@@ -4278,19 +4308,7 @@ function flashCopy(msg = 'Copied!') {
   setTimeout(() => el.remove(), 1300);
 }
 
-// ── ENHANCED PARAM RESULT with copy button ───────────────────────────
-const _origRenderParamResult = renderParamResult;
-function renderParamResult(param, result) {
-  const base = _origRenderParamResult(param, result);
-  // FIX: replace LAST </div> (closing the param-result div), not first
-  const escapedParam = param.replace(/'/g, "\'");
-  const actions = `<div class="param-result-actions">
-      <button class="pra-btn" onclick="copyParamResult('${escapedParam}')" title="Copy to clipboard">📋 Copy</button>
-      <button class="pra-btn" onclick="sendParamToChat('${escapedParam}')" title="Ask AI more">💬 Ask more</button>
-    </div>`;
-  const lastClose = base.lastIndexOf('</div>');
-  return base.substring(0, lastClose) + actions + '</div>';
-}
+// ── PARAM RESULT COPY/ASK ACTIONS — added directly in renderParamResult ──
 function copyParamResult(param) {
   const r = STATE.analysisResults[param];
   if (!r) return;
