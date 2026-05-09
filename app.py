@@ -32,7 +32,10 @@ hide_st_style = """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 # ── Read the HTML file ───────────────────────────────────────
-html_file_path = os.path.join(os.path.dirname(__file__), "index.html")
+# os.path.dirname(__file__) returns empty string with streamlit run;
+# os.path.abspath fixes that.
+_script_dir = os.path.dirname(os.path.abspath(__file__))
+html_file_path = os.path.join(_script_dir, "index.html")
 with open(html_file_path, "r", encoding="utf-8") as f:
     html_content = f.read()
 
@@ -78,4 +81,4 @@ html_content = html_content.replace("</head>", inject_script + "\n</head>")
 # a fallback — this is just an extra option for reliability.
 
 # ── Render the HTML application ─────────────────────────────
-components.html(html_content, height=1200, scrolling=True)
+components.html(html_content, height=900, scrolling=True)

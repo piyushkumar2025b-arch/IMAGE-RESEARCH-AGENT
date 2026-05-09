@@ -596,6 +596,424 @@
 
   /* Select all / none */
   .select-actions { display: flex; gap: 8px; margin-bottom: 1rem; }
+
+  /* ══════════════════════════════════════════════════════════
+     IRIS v2.0 — NEW FEATURE STYLES
+     ══════════════════════════════════════════════════════════ */
+
+  /* THEME TOGGLE */
+  .theme-toggle {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 10px;
+    font-size: 0.72rem; cursor: pointer; color: var(--text2);
+    font-family: 'Space Mono', monospace; transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+  body.light-theme {
+    --bg: #f0f4ff; --bg2: #e4eaf8; --bg3: #d8e0f5;
+    --panel: #e8eef8; --border: #c0ccdd; --border2: #a8b8d0;
+    --text: #1a2240; --text2: #3a4a6a; --text3: #5a6a8a;
+  }
+  body.light-theme body::before { background-image:
+    linear-gradient(rgba(0,100,200,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,100,200,0.04) 1px, transparent 1px); }
+
+  /* LIVE CLOCK IN HEADER */
+  .header-clock {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem; color: var(--text3);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 8px; letter-spacing: 0.05em;
+  }
+
+  /* KEYBOARD SHORTCUTS BADGE */
+  .shortcut-hint {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem; color: var(--text3);
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 2px 6px;
+    display: inline-block;
+  }
+
+  /* BATCH UPLOAD PANEL */
+  .batch-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
+    gap: 10px; margin-top: 1rem;
+  }
+  .batch-thumb {
+    aspect-ratio: 1; border-radius: 8px; overflow: hidden;
+    background: var(--bg2); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s; position: relative;
+  }
+  .batch-thumb:hover { border-color: var(--accent); }
+  .batch-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .batch-thumb .batch-remove {
+    position: absolute; top: 4px; right: 4px;
+    background: rgba(0,0,0,0.6); border: none; border-radius: 50%;
+    width: 20px; height: 20px; cursor: pointer; color: #fff;
+    font-size: 0.7rem; display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .batch-thumb:hover .batch-remove { opacity: 1; }
+  .batch-thumb .batch-status {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.7); font-size: 0.6rem;
+    font-family: 'Space Mono', monospace; color: #fff;
+    padding: 3px 6px; text-align: center;
+  }
+  .batch-thumb.done-batch { border-color: var(--green); }
+  .batch-thumb.analyzing-batch { border-color: var(--accent); }
+
+  /* HISTORY PANEL */
+  .history-list { display: flex; flex-direction: column; gap: 10px; }
+  .history-item {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem;
+    display: flex; gap: 12px; align-items: flex-start;
+    cursor: pointer; transition: border-color 0.2s;
+  }
+  .history-item:hover { border-color: var(--accent); }
+  .history-thumb {
+    width: 56px; height: 56px; border-radius: 8px;
+    object-fit: cover; flex-shrink: 0;
+    background: var(--bg); border: 1px solid var(--border);
+  }
+  .history-info { flex: 1; min-width: 0; }
+  .history-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .history-meta { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--text3); margin-top: 4px; }
+  .history-tags { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+  .history-tag {
+    font-size: 0.6rem; font-family: 'Space Mono', monospace;
+    padding: 2px 7px; border-radius: 12px;
+    background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2); color: var(--accent);
+  }
+  .history-actions { display: flex; flex-direction: column; gap: 6px; }
+  .history-empty { text-align: center; color: var(--text3); padding: 3rem; font-size: 0.85rem; }
+
+  /* COMPARISON MODE */
+  .compare-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+  }
+  @media(max-width:600px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-slot {
+    background: var(--bg2); border: 2px dashed var(--border2);
+    border-radius: 12px; padding: 1.5rem; text-align: center;
+    min-height: 200px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px;
+    cursor: pointer; transition: all 0.3s;
+  }
+  .compare-slot:hover { border-color: var(--accent); background: rgba(0,229,255,0.03); }
+  .compare-slot.loaded { border-style: solid; border-color: var(--border); cursor: default; }
+  .compare-slot img { max-width: 100%; max-height: 180px; border-radius: 8px; object-fit: contain; }
+  .compare-result-row {
+    display: flex; gap: 1rem; margin-bottom: 10px; align-items: stretch;
+  }
+  .compare-cell {
+    flex: 1; background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px; font-size: 0.8rem;
+  }
+  .compare-label { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--accent); margin-bottom: 6px; text-transform: uppercase; }
+  .compare-winner { border-color: var(--green) !important; }
+  .compare-loser  { opacity: 0.65; }
+
+  /* CHART PANEL (radar / bar) */
+  .chart-wrap {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem;
+  }
+  .chart-tabs { display: flex; gap: 6px; margin-bottom: 1rem; }
+  .chart-tab {
+    padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+    background: var(--bg); font-size: 0.78rem; cursor: pointer;
+    color: var(--text2); transition: all 0.2s;
+  }
+  .chart-tab.active { border-color: var(--accent); color: var(--accent); background: rgba(0,229,255,0.08); }
+
+  /* ANNOTATION CANVAS */
+  .annotate-wrap {
+    position: relative; display: inline-block;
+    background: var(--bg2); border-radius: 8px; overflow: hidden;
+  }
+  .annotate-wrap canvas { display: block; max-width: 100%; }
+  .annotate-toolbar {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    padding: 10px; background: var(--bg2);
+    border-top: 1px solid var(--border); border-radius: 0 0 8px 8px;
+  }
+  .annot-tool-btn {
+    padding: 6px 12px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--bg);
+    color: var(--text2); font-size: 0.78rem; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .annot-tool-btn:hover, .annot-tool-btn.active { border-color: var(--accent); color: var(--accent); }
+
+  /* SETTINGS DRAWER */
+  .settings-drawer {
+    position: fixed; right: 0; top: 64px; bottom: 0;
+    width: 320px; background: var(--bg2);
+    border-left: 1px solid var(--border);
+    z-index: 50; transform: translateX(100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto; padding: 1.5rem;
+  }
+  .settings-drawer.open { transform: translateX(0); }
+  .settings-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    z-index: 49; display: none;
+  }
+  .settings-overlay.open { display: block; }
+  .settings-section { margin-bottom: 1.5rem; }
+  .settings-section-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 0.8rem; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text3);
+    margin-bottom: 10px; padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .settings-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+  }
+  .settings-label { font-size: 0.85rem; color: var(--text2); }
+  .toggle-switch {
+    width: 36px; height: 20px; border-radius: 10px;
+    background: var(--border2); position: relative;
+    cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+  }
+  .toggle-switch.on { background: var(--accent); }
+  .toggle-switch::after {
+    content: ''; position: absolute;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #fff; top: 3px; left: 3px;
+    transition: transform 0.2s;
+  }
+  .toggle-switch.on::after { transform: translateX(16px); }
+  .settings-slider {
+    width: 100%; accent-color: var(--accent);
+    margin-top: 6px;
+  }
+  .settings-select {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 10px; color: var(--text);
+    font-size: 0.82rem; margin-top: 6px; outline: none;
+  }
+
+  /* FOCUSMAP HEATMAP */
+  .heatmap-wrap {
+    position: relative; display: inline-block;
+    border-radius: 8px; overflow: hidden;
+  }
+  .heatmap-wrap img { display: block; max-width: 100%; }
+  .heatmap-overlay {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 60% 35%, rgba(255,80,0,0.45) 0%, rgba(255,200,0,0.3) 30%, rgba(0,229,255,0.1) 65%, transparent 100%);
+    mix-blend-mode: screen; pointer-events: none;
+    opacity: 0; transition: opacity 0.5s;
+  }
+  .heatmap-wrap.show-heat .heatmap-overlay { opacity: 1; }
+
+  /* QUICK PROMPT CHIPS */
+  .quick-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .quick-chip {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem; padding: 5px 12px; border-radius: 20px;
+    border: 1px solid var(--border2); color: var(--text2);
+    background: var(--bg2); cursor: pointer; transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .quick-chip:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,229,255,0.06); }
+
+  /* CHAT / ASK AI PANEL */
+  .chat-messages {
+    height: 280px; overflow-y: auto;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem; margin-bottom: 10px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .chat-messages::-webkit-scrollbar { width: 3px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border2); }
+  .chat-msg {
+    max-width: 85%; padding: 10px 14px; border-radius: 12px;
+    font-size: 0.83rem; line-height: 1.5;
+  }
+  .chat-msg.user {
+    background: linear-gradient(135deg, var(--accent2), rgba(124,58,237,0.6));
+    color: #fff; align-self: flex-end; border-radius: 12px 12px 0 12px;
+  }
+  .chat-msg.ai {
+    background: var(--bg2); border: 1px solid var(--border);
+    color: var(--text); align-self: flex-start; border-radius: 12px 12px 12px 0;
+  }
+  .chat-msg.ai.thinking {
+    color: var(--text3); font-style: italic; font-size: 0.75rem;
+  }
+  .chat-input-row { display: flex; gap: 8px; }
+  .chat-input {
+    flex: 1; background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; color: var(--text);
+    font-size: 0.85rem; outline: none; font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s;
+  }
+  .chat-input:focus { border-color: var(--accent); }
+
+  /* EXPORT MODAL extra */
+  .export-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
+  .export-opt {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem; cursor: pointer;
+    transition: all 0.2s; text-align: center;
+  }
+  .export-opt:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .export-opt-icon { font-size: 2rem; margin-bottom: 8px; }
+  .export-opt-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.9rem; }
+  .export-opt-desc { font-size: 0.73rem; color: var(--text2); margin-top: 4px; }
+
+  /* MINI SPARKLINE */
+  .sparkline-svg { display: block; }
+
+  /* WATERMARK OVERLAY */
+  .watermark-badge {
+    position: fixed; bottom: 80px; left: 2rem;
+    font-family: 'Space Mono', monospace; font-size: 0.6rem;
+    color: var(--text3); z-index: 5;
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 8px; background: var(--bg2);
+    opacity: 0.6;
+  }
+
+  /* LANGUAGE SELECTOR */
+  .lang-select {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 4px 8px; color: var(--text2);
+    font-size: 0.72rem; font-family: 'Space Mono', monospace;
+    cursor: pointer; outline: none;
+  }
+
+  /* NEW FEATURE PANEL — VISUAL STATS DASHBOARD */
+  .vstat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .vstat-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem; text-align: center;
+  }
+  .vstat-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.8rem; color: var(--accent); }
+  .vstat-label { font-size: 0.72rem; color: var(--text3); margin-top: 4px; font-family: 'Space Mono', monospace; }
+  .vstat-sub { font-size: 0.68rem; color: var(--text2); margin-top: 2px; }
+
+  /* COLOR PALETTE EXTRACTOR */
+  .palette-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .palette-swatch {
+    width: 40px; height: 40px; border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer; transition: transform 0.2s;
+    position: relative;
+  }
+  .palette-swatch:hover { transform: scale(1.15); }
+  .palette-swatch::after {
+    content: attr(data-hex);
+    position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
+    font-family: 'Space Mono', monospace; font-size: 0.55rem; color: var(--text3);
+    white-space: nowrap;
+  }
+
+  /* SENTIMENT METER */
+  .sentiment-bar-outer {
+    height: 10px; background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
+    border-radius: 5px; position: relative; margin: 1rem 0;
+  }
+  .sentiment-needle {
+    position: absolute; top: -4px;
+    width: 4px; height: 18px; background: #fff;
+    border-radius: 2px; transform: translateX(-50%);
+    box-shadow: 0 0 6px rgba(0,0,0,0.5);
+    transition: left 1s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  /* FACE / OBJECT DETECTION BOXES */
+  .detect-canvas-wrap { position: relative; display: inline-block; }
+  .detect-canvas-wrap img { display: block; max-width: 100%; border-radius: 8px; }
+  .detect-canvas {
+    position: absolute; top: 0; left: 0; pointer-events: none;
+    border-radius: 8px;
+  }
+
+  /* TAG CLOUD */
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1rem; }
+  .cloud-tag {
+    font-family: 'Space Mono', monospace;
+    border-radius: 20px; padding: 4px 12px;
+    border: 1px solid var(--border); cursor: default;
+    transition: transform 0.2s;
+  }
+  .cloud-tag:hover { transform: scale(1.05); }
+
+  /* RESULT CARD ACTIONS */
+  .param-result-actions {
+    display: flex; gap: 6px; margin-top: 8px;
+  }
+  .pra-btn {
+    font-size: 0.7rem; font-family: 'Space Mono', monospace;
+    padding: 3px 9px; border-radius: 5px;
+    border: 1px solid var(--border); background: var(--bg);
+    color: var(--text3); cursor: pointer; transition: all 0.2s;
+  }
+  .pra-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* COPY BADGE */
+  .copy-flash {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    background: var(--accent); color: var(--bg);
+    font-family: 'Space Mono', monospace; font-size: 0.8rem;
+    padding: 8px 20px; border-radius: 20px;
+    pointer-events: none; z-index: 999;
+    animation: copyPop 1.2s ease forwards;
+  }
+  @keyframes copyPop {
+    0%  { opacity:0; transform:translate(-50%,-50%) scale(0.8); }
+    20% { opacity:1; transform:translate(-50%,-50%) scale(1.05); }
+    80% { opacity:1; transform:translate(-50%,-50%) scale(1); }
+    100%{ opacity:0; transform:translate(-50%,-60%) scale(0.9); }
+  }
+
+  /* FULLSCREEN IMAGE VIEWER */
+  .fullscreen-viewer {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 500; display: none;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 1rem;
+  }
+  .fullscreen-viewer.open { display: flex; }
+  .fullscreen-viewer img { max-width: 90vw; max-height: 80vh; border-radius: 8px; }
+  .fullscreen-viewer .fv-close {
+    position: absolute; top: 1.5rem; right: 2rem;
+    background: none; border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; font-size: 1.5rem; cursor: pointer; border-radius: 8px;
+    width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+  }
+  .fullscreen-viewer .fv-info {
+    font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    color: rgba(255,255,255,0.5); text-align: center;
+  }
+
+  /* SCROLLBAR GLOBAL */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent2); }
+
+  /* RIPPLE on buttons */
+  .btn { overflow: hidden; }
+  .ripple {
+    position: absolute; border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transform: scale(0); animation: ripple 0.5s linear;
+    pointer-events: none;
+  }
+  @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -611,9 +1029,103 @@
   </div>
   <div class="header-right">
     <div class="status-badge" id="apiStatusBadge">NO API KEY</div>
-    <div class="status-badge active" id="versionBadge">v0.9 PROTOTYPE</div>
+    <div class="status-badge active" id="versionBadge">v2.0 ENHANCED</div>
+    <div class="header-clock" id="headerClock">00:00:00</div>
+    <select class="lang-select" id="uiLang" onchange="setUiLang(this.value)" title="Report language">
+      <option value="en">🌐 EN</option>
+      <option value="es">🇪🇸 ES</option>
+      <option value="fr">🇫🇷 FR</option>
+      <option value="de">🇩🇪 DE</option>
+      <option value="ja">🇯🇵 JA</option>
+      <option value="zh">🇨🇳 ZH</option>
+      <option value="ar">🇸🇦 AR</option>
+    </select>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark</button>
+    <button class="theme-toggle" onclick="openSettings()" title="Settings [S]">⚙️ Settings</button>
   </div>
 </header>
+<!-- SETTINGS DRAWER -->
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
+<div class="settings-drawer" id="settingsDrawer">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem">⚙️ Settings</div>
+    <button onclick="closeSettings()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:1.2rem">✕</button>
+  </div>
+  <div class="settings-section">
+    <div class="settings-section-title">Analysis</div>
+    <div class="settings-row">
+      <span class="settings-label">Auto-save results</span>
+      <div class="toggle-switch on" id="toggleAutoSave" onclick="toggleSetting('autoSave', this)"></div>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Show confidence scores</span>
+      <div class="toggle-switch on" id="toggleShowScores" onclick="toggleSetting('showScores', this)"></div>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Parallel API calls</span>
+      <div class="toggle-switch" id="toggleParallel" onclick="toggleSetting('parallelCalls', this)"></div>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Include wiki context</span>
+      <div class="toggle-switch on" id="toggleWiki" onclick="toggleSetting('wikiContext', this)"></div>
+    </div>
+    <label class="settings-label" style="display:block;margin-bottom:4px">API delay (ms)</label>
+    <input class="settings-slider" type="range" min="500" max="8000" step="500" value="3000" id="delaySlider" oninput="SETTINGS.apiDelay=+this.value; document.getElementById('delayVal').textContent=this.value+'ms'">
+    <span style="font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--accent)" id="delayVal">3000ms</span>
+    <label class="settings-label" style="display:block;margin-top:12px;margin-bottom:4px">Max tokens per call</label>
+    <select class="settings-select" id="maxTokensSel" onchange="SETTINGS.maxTokens=+this.value">
+      <option value="200">200 (fast)</option>
+      <option value="400" selected>400 (balanced)</option>
+      <option value="800">800 (detailed)</option>
+      <option value="1500">1500 (verbose)</option>
+    </select>
+  </div>
+  <div class="settings-section">
+    <div class="settings-section-title">Appearance</div>
+    <div class="settings-row">
+      <span class="settings-label">Compact mode</span>
+      <div class="toggle-switch" id="toggleCompact" onclick="toggleSetting('compact', this)"></div>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Animations</span>
+      <div class="toggle-switch on" id="toggleAnim" onclick="toggleSetting('animations', this)"></div>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Show heatmap overlay</span>
+      <div class="toggle-switch" id="toggleHeatmap" onclick="toggleSetting('heatmap', this)"></div>
+    </div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-section-title">Report</div>
+    <div class="settings-row">
+      <span class="settings-label">Include metadata</span>
+      <div class="toggle-switch on" id="toggleMeta" onclick="toggleSetting('includeMeta', this)"></div>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Include similar images</span>
+      <div class="toggle-switch on" id="toggleSimImg" onclick="toggleSetting('includeSimImg', this)"></div>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Auto-translate report</span>
+      <div class="toggle-switch" id="toggleAutoTrans" onclick="toggleSetting('autoTranslate', this)"></div>
+    </div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-section-title">Data</div>
+    <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:8px" onclick="exportAllHistory()">📦 Export All History</button>
+    <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:8px" onclick="importHistory()">📂 Import History</button>
+    <button class="btn btn-danger btn-sm" style="width:100%" onclick="clearAllHistory()">🗑️ Clear All History</button>
+  </div>
+  <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--text3);margin-top:1.5rem;text-align:center">
+    IRIS v2.0 · Built with ❤️<br>All data stored locally
+  </div>
+</div>
+<!-- FULLSCREEN VIEWER -->
+<div class="fullscreen-viewer" id="fullscreenViewer">
+  <button class="fv-close" onclick="closeFullscreen()">✕</button>
+  <img id="fvImg" src="" alt="">
+  <div class="fv-info" id="fvInfo">Click outside to close · Scroll to zoom</div>
+</div>
 
 <!-- STEPS NAV -->
 <nav class="steps-nav">
@@ -628,6 +1140,8 @@
   <div class="step-item" id="sn5"><div class="step-num">5</div><span>Analysis</span></div>
   <div class="step-sep">›</div>
   <div class="step-item" id="sn6"><div class="step-num">6</div><span>Done</span></div>
+  <div class="step-sep">›</div>
+  <div class="step-item" id="sn7"><div class="step-num">7</div><span>History</span></div>
 </nav>
 
 <main>
@@ -939,8 +1453,19 @@
         </div>
       </div>
 
+      <div style="margin-top:1rem;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;display:none" id="exifCard">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;margin-bottom:10px">📷 EXIF / Metadata</div>
+        <div id="exifDisplay" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px"></div>
+      </div>
+      <div style="margin-top:1rem;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;display:none" id="imageInfoCard">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;margin-bottom:10px">📐 Image Diagnostics</div>
+        <div id="imageDiagDisplay" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px"></div>
+      </div>
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+        <button class="btn btn-ghost btn-sm" onclick="openPalette()" id="paletteBtn" disabled>🎨 Palette</button>
+        <button class="btn btn-ghost btn-sm" onclick="openAnnotate()" id="annotBtn" disabled>✏️ Annotate</button>
+        <button class="btn btn-ghost btn-sm" onclick="openFullscreen()" id="fsBtn" disabled>⤢ Fullscreen</button>
         <button class="btn btn-primary" id="step2Next" onclick="goStep(3)" disabled>Continue →</button>
       </div>
     </div>
@@ -1171,6 +1696,31 @@
           <div class="done-check" id="emailCheck"><span class="check-icon">⏳</span>Email report pending…</div>
         </div>
 
+        <div id="doneStatsDash" style="margin:1.5rem auto;max-width:600px">
+          <div class="vstat-grid" id="doneVStats">
+            <div class="vstat-card"><div class="vstat-val" id="doneParamCount">0</div><div class="vstat-label">Parameters</div><div class="vstat-sub">analyzed</div></div>
+            <div class="vstat-card"><div class="vstat-val" id="doneAvgScore">0%</div><div class="vstat-label">Avg Confidence</div><div class="vstat-sub">across all params</div></div>
+            <div class="vstat-card"><div class="vstat-val" id="doneTopScore">—</div><div class="vstat-label">Top Score</div><div class="vstat-sub" id="doneTopParam">parameter</div></div>
+            <div class="vstat-card"><div class="vstat-val" id="doneApiCalls">0</div><div class="vstat-label">API Calls</div><div class="vstat-sub" id="doneTokenCount">tokens</div></div>
+          </div>
+          <div style="margin-top:1rem">
+            <div style="font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;margin-bottom:8px">Sentiment Meter</div>
+            <div class="sentiment-bar-outer">
+              <div class="sentiment-needle" id="sentimentNeedle" style="left:50%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--text3)">
+              <span>Negative</span><span>Neutral</span><span>Positive</span>
+            </div>
+          </div>
+          <div style="margin-top:1.5rem">
+            <div style="font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;margin-bottom:8px">Top Parameter Scores</div>
+            <div id="doneTopParams" style="display:flex;flex-direction:column;gap:6px"></div>
+          </div>
+          <div style="margin-top:1.5rem">
+            <div style="font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;margin-bottom:8px">Keyword Cloud</div>
+            <div class="tag-cloud" id="keywordCloud"></div>
+          </div>
+        </div>
         <div class="done-actions">
           <button class="btn btn-secondary" onclick="downloadReport()">⬇️ Download Full Report</button>
           <button class="btn btn-secondary" onclick="downloadReport('json')">📄 Export JSON</button>
@@ -1183,7 +1733,235 @@
     </div>
   </div>
 
+
+  <!-- ===== STEP 7: HISTORY ===== -->
+  <div class="panel" id="step7">
+    <div class="panel-header">
+      <div class="panel-icon">📚</div>
+      <div>
+        <div class="panel-title">Analysis History</div>
+        <div class="panel-sub">All past sessions stored locally in your browser</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="exportAllHistory()">📦 Export All</button>
+        <button class="btn btn-danger btn-sm" onclick="clearAllHistory()">🗑️ Clear</button>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="vstat-grid" id="historyStats">
+        <div class="vstat-card"><div class="vstat-val" id="hsTotalRuns">0</div><div class="vstat-label">Total Runs</div></div>
+        <div class="vstat-card"><div class="vstat-val" id="hsTotalParams">0</div><div class="vstat-label">Params Analyzed</div></div>
+        <div class="vstat-card"><div class="vstat-val" id="hsAvgScore">—</div><div class="vstat-label">Avg Confidence</div></div>
+        <div class="vstat-card"><div class="vstat-val" id="hsFavModel">—</div><div class="vstat-label">Favourite Model</div></div>
+      </div>
+      <div style="margin-bottom:1rem">
+        <input class="param-search" id="historySearch" placeholder="🔍 Search history by filename or parameter…" oninput="renderHistory()" style="width:100%">
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== COMPARE PANEL (modal-like inside main) ===== -->
+  <div class="panel" id="comparePanel" style="display:none">
+    <div class="panel-header">
+      <div class="panel-icon">⚖️</div>
+      <div>
+        <div class="panel-title">Side-by-Side Comparison</div>
+        <div class="panel-sub">Load two images and compare their analysis results</div>
+      </div>
+      <div style="margin-left:auto">
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('comparePanel').style.display='none'">✕ Close</button>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="compare-grid">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;margin-bottom:10px;color:var(--accent)">IMAGE A</div>
+          <div class="compare-slot" id="compareSlotA" onclick="loadCompareSlot('A')">
+            <span style="font-size:2rem">🅰️</span>
+            <span style="color:var(--text3);font-size:0.85rem">Click to load image</span>
+          </div>
+          <input type="file" id="compareFileA" accept="image/*" style="display:none" onchange="processCompareFile('A',this)">
+        </div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;margin-bottom:10px;color:var(--accent2)">IMAGE B</div>
+          <div class="compare-slot" id="compareSlotB" onclick="loadCompareSlot('B')">
+            <span style="font-size:2rem">🅱️</span>
+            <span style="color:var(--text3);font-size:0.85rem">Click to load image</span>
+          </div>
+          <input type="file" id="compareFileB" accept="image/*" style="display:none" onchange="processCompareFile('B',this)">
+        </div>
+      </div>
+      <div class="btn-row" style="justify-content:center;margin-top:1.5rem">
+        <button class="btn btn-primary" onclick="runComparison()" id="compareRunBtn" disabled>⚖️ Run Comparison →</button>
+      </div>
+      <div id="compareResults" style="margin-top:1.5rem"></div>
+    </div>
+  </div>
+
+  <!-- ===== ASK AI CHAT PANEL ===== -->
+  <div class="panel" id="chatPanel" style="display:none">
+    <div class="panel-header">
+      <div class="panel-icon">💬</div>
+      <div>
+        <div class="panel-title">Ask AI About This Image</div>
+        <div class="panel-sub">Chat with the AI about your uploaded image or analysis results</div>
+      </div>
+      <div style="margin-left:auto">
+        <button class="btn btn-ghost btn-sm" onclick="clearChat()">🗑️ Clear</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('chatPanel').style.display='none'">✕ Close</button>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="quick-chips" id="quickChips">
+        <div class="quick-chip" onclick="sendQuickPrompt(this)">What is the main subject?</div>
+        <div class="quick-chip" onclick="sendQuickPrompt(this)">Describe the colors</div>
+        <div class="quick-chip" onclick="sendQuickPrompt(this)">What mood does this convey?</div>
+        <div class="quick-chip" onclick="sendQuickPrompt(this)">Is this AI-generated?</div>
+        <div class="quick-chip" onclick="sendQuickPrompt(this)">What time of day is it?</div>
+        <div class="quick-chip" onclick="sendQuickPrompt(this)">Estimate the location</div>
+        <div class="quick-chip" onclick="sendQuickPrompt(this)">What camera was used?</div>
+        <div class="quick-chip" onclick="sendQuickPrompt(this)">Rate the composition</div>
+        <div class="quick-chip" onclick="sendQuickPrompt(this)">Any text visible?</div>
+        <div class="quick-chip" onclick="sendQuickPrompt(this)">Who is the target audience?</div>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg ai">👋 Hi! I'm IRIS AI. Upload an image and I can answer any question about it — composition, content, mood, authenticity, and more.</div>
+      </div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chatInput" placeholder="Ask anything about the image…" onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn btn-primary btn-sm" onclick="sendChat()" id="chatSendBtn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COLOUR PALETTE PANEL ===== -->
+  <div class="panel" id="palettePanel" style="display:none">
+    <div class="panel-header">
+      <div class="panel-icon">🎨</div>
+      <div>
+        <div class="panel-title">Colour Palette Extractor</div>
+        <div class="panel-sub">Dominant colours extracted from your image via canvas sampling</div>
+      </div>
+      <div style="margin-left:auto">
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('palettePanel').style.display='none'">✕ Close</button>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:flex-start">
+        <div>
+          <img id="palettePreviewImg" style="max-width:260px;border-radius:8px;border:1px solid var(--border)" src="" alt="">
+        </div>
+        <div style="flex:1;min-width:220px">
+          <div style="font-family:'Syne',sans-serif;font-weight:600;margin-bottom:6px">Dominant Colours</div>
+          <div class="palette-row" id="paletteSwatches" style="margin-bottom:2rem"></div>
+          <div style="font-family:'Syne',sans-serif;font-weight:600;margin-bottom:6px">Colour Harmony</div>
+          <div id="harmonyResult" style="font-size:0.85rem;color:var(--text2);line-height:1.6"></div>
+          <div style="font-family:'Syne',sans-serif;font-weight:600;margin-top:1rem;margin-bottom:6px">Tone Distribution</div>
+          <canvas id="toneChart" width="300" height="80" style="border-radius:6px;max-width:100%"></canvas>
+          <div class="btn-row" style="justify-content:flex-start;margin-top:1rem">
+            <button class="btn btn-secondary btn-sm" onclick="copyPaletteCSS()">📋 Copy as CSS Variables</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadPalette()">⬇️ Download Palette</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ANNOTATION CANVAS PANEL ===== -->
+  <div class="panel" id="annotatePanel" style="display:none">
+    <div class="panel-header">
+      <div class="panel-icon">✏️</div>
+      <div>
+        <div class="panel-title">Image Annotation</div>
+        <div class="panel-sub">Draw boxes, arrows and notes directly on your image</div>
+      </div>
+      <div style="margin-left:auto">
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('annotatePanel').style.display='none'">✕ Close</button>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="annotate-toolbar">
+        <button class="annot-tool-btn active" id="toolRect" onclick="setAnnotTool('rect',this)">▭ Box</button>
+        <button class="annot-tool-btn" id="toolArrow" onclick="setAnnotTool('arrow',this)">↗ Arrow</button>
+        <button class="annot-tool-btn" id="toolText" onclick="setAnnotTool('text',this)">T Text</button>
+        <button class="annot-tool-btn" id="toolFree" onclick="setAnnotTool('free',this)">✏️ Draw</button>
+        <button class="annot-tool-btn" id="toolErase" onclick="setAnnotTool('erase',this)">⌫ Erase</button>
+        <input type="color" id="annotColor" value="#00e5ff" title="Colour" style="width:32px;height:32px;border:none;background:none;cursor:pointer;border-radius:4px">
+        <input type="range" id="annotWidth" min="1" max="12" value="2" style="width:80px;accent-color:var(--accent)" title="Brush size">
+        <button class="annot-tool-btn" onclick="undoAnnot()">↩ Undo</button>
+        <button class="annot-tool-btn" onclick="clearAnnot()">🗑️ Clear</button>
+        <button class="btn btn-secondary btn-sm" onclick="saveAnnotImage()">💾 Save Image</button>
+      </div>
+      <div class="annotate-wrap" id="annotateWrap" style="margin-top:10px">
+        <canvas id="annotCanvas" style="cursor:crosshair;max-width:100%"></canvas>
+      </div>
+    </div>
+  </div>
+
 </main>
+
+
+<!-- WATERMARK -->
+<div class="watermark-badge">IRIS v2.0 · LOCAL</div>
+
+<!-- FLOATING TOOLBAR -->
+<div id="floatToolbar" style="position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
+  display:none;background:var(--bg2);border:1px solid var(--border2);border-radius:40px;
+  padding:8px 16px;gap:8px;align-items:center;z-index:30;box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  backdrop-filter:blur(16px);">
+  <button class="annot-tool-btn" style="border-radius:20px" onclick="openChat()" title="Ask AI [C]">💬 Ask AI</button>
+  <button class="annot-tool-btn" style="border-radius:20px" onclick="openPalette()" title="Palette [P]">🎨 Palette</button>
+  <button class="annot-tool-btn" style="border-radius:20px" onclick="openAnnotate()" title="Annotate [A]">✏️ Annotate</button>
+  <button class="annot-tool-btn" style="border-radius:20px" onclick="openCompare()" title="Compare [V]">⚖️ Compare</button>
+  <button class="annot-tool-btn" style="border-radius:20px" onclick="goStep(7)" title="History [H]">📚 History</button>
+  <button class="annot-tool-btn" style="border-radius:20px" onclick="openExportModal()" title="Export [E]">📤 Export</button>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-bg" id="exportModalBg" onclick="closeExportModal(event)">
+  <div class="modal" style="max-width:560px">
+    <button class="modal-close" onclick="closeExportModal()">✕</button>
+    <div class="modal-title">📤 Export Analysis</div>
+    <div class="modal-sub">Choose your export format</div>
+    <div class="export-options">
+      <div class="export-opt" onclick="downloadReport('txt')">
+        <div class="export-opt-icon">📄</div>
+        <div class="export-opt-name">Plain Text</div>
+        <div class="export-opt-desc">Full report as .txt file</div>
+      </div>
+      <div class="export-opt" onclick="downloadReport('json')">
+        <div class="export-opt-icon">🔢</div>
+        <div class="export-opt-name">JSON</div>
+        <div class="export-opt-desc">Machine-readable data</div>
+      </div>
+      <div class="export-opt" onclick="exportPDF()">
+        <div class="export-opt-icon">🖨️</div>
+        <div class="export-opt-name">PDF Report</div>
+        <div class="export-opt-desc">Formatted with html2pdf</div>
+      </div>
+      <div class="export-opt" onclick="exportMarkdown()">
+        <div class="export-opt-icon">📝</div>
+        <div class="export-opt-name">Markdown</div>
+        <div class="export-opt-desc">Great for Notion / GitHub</div>
+      </div>
+      <div class="export-opt" onclick="exportCSV()">
+        <div class="export-opt-icon">📊</div>
+        <div class="export-opt-name">CSV Spreadsheet</div>
+        <div class="export-opt-desc">Open in Excel / Sheets</div>
+      </div>
+      <div class="export-opt" onclick="exportHTML()">
+        <div class="export-opt-icon">🌐</div>
+        <div class="export-opt-name">HTML Report</div>
+        <div class="export-opt-desc">Self-contained web page</div>
+      </div>
+    </div>
+    <div style="margin-top:1rem;text-align:center">
+      <button class="btn btn-ghost btn-sm" onclick="sendToTelegram()">✈️ Send via Telegram</button>
+      <button class="btn btn-ghost btn-sm" onclick="sendEmailReport()">📧 Send via Email</button>
+    </div>
+  </div>
+</div>
 
 <!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
@@ -1474,7 +2252,6 @@ function loadSavedKeys() {
       toast('📂 Saved keys loaded', 'info');
     }
   } catch(e) {}
-  } // end IRIS_PREFILL try
 }
 
 function collectKeys() {
@@ -2748,6 +3525,797 @@ async function callSightengine() {
     return results.join(' | ') || 'All content checks passed';
   } catch(e) { log('warn', 'Sightengine error: ' + e.message); return null; }
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// IRIS v2.0 — NEW FEATURES JAVASCRIPT
+// ═══════════════════════════════════════════════════════════════════
+
+// ── SETTINGS OBJECT ─────────────────────────────────────────────────
+const SETTINGS = {
+  autoSave: true, showScores: true, parallelCalls: false,
+  wikiContext: true, apiDelay: 3000, maxTokens: 400,
+  compact: false, animations: true, heatmap: false,
+  includeMeta: true, includeSimImg: true, autoTranslate: false,
+};
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('iris_settings') || '{}');
+    Object.assign(SETTINGS, s);
+    // Sync toggles
+    ['autoSave','showScores','parallelCalls','wikiContext','compact','animations','heatmap','includeMeta','includeSimImg','autoTranslate'].forEach(k => {
+      const el = document.getElementById('toggle' + k.charAt(0).toUpperCase() + k.slice(1));
+      if (el) { el.classList.toggle('on', !!SETTINGS[k]); }
+    });
+    const ds = document.getElementById('delaySlider');
+    if (ds) { ds.value = SETTINGS.apiDelay; document.getElementById('delayVal').textContent = SETTINGS.apiDelay + 'ms'; }
+  } catch(e) {}
+}
+function saveSettings() { localStorage.setItem('iris_settings', JSON.stringify(SETTINGS)); }
+function toggleSetting(key, el) {
+  SETTINGS[key] = !SETTINGS[key];
+  el.classList.toggle('on', SETTINGS[key]);
+  saveSettings();
+}
+function openSettings() {
+  document.getElementById('settingsDrawer').classList.add('open');
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settingsDrawer').classList.remove('open');
+  document.getElementById('settingsOverlay').classList.remove('open');
+}
+
+// ── LIVE CLOCK ───────────────────────────────────────────────────────
+function startClock() {
+  setInterval(() => {
+    const now = new Date();
+    const t = [now.getHours(), now.getMinutes(), now.getSeconds()]
+      .map(n => String(n).padStart(2,'0')).join(':');
+    const el = document.getElementById('headerClock');
+    if (el) el.textContent = t;
+  }, 1000);
+}
+
+// ── THEME TOGGLE ─────────────────────────────────────────────────────
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-theme');
+  document.getElementById('themeBtn').textContent = isLight ? '☀️ Light' : '🌙 Dark';
+  localStorage.setItem('iris_theme', isLight ? 'light' : 'dark');
+}
+function loadTheme() {
+  const t = localStorage.getItem('iris_theme');
+  if (t === 'light') { document.body.classList.add('light-theme'); document.getElementById('themeBtn').textContent = '☀️ Light'; }
+}
+
+// ── UI LANGUAGE ──────────────────────────────────────────────────────
+const UI_STRINGS = {
+  en: { analyze: 'Start Analysis →', upload: 'Drop image here', history: 'History' },
+  es: { analyze: 'Iniciar análisis →', upload: 'Arrastra imagen aquí', history: 'Historial' },
+  fr: { analyze: 'Lancer l\'analyse →', upload: 'Déposer image ici', history: 'Historique' },
+  de: { analyze: 'Analyse starten →', upload: 'Bild hier ablegen', history: 'Verlauf' },
+  ja: { analyze: '分析開始 →', upload: '画像をドロップ', history: '履歴' },
+  zh: { analyze: '开始分析 →', upload: '拖放图片到此', history: '历史记录' },
+  ar: { analyze: 'بدء التحليل →', upload: 'أسقط الصورة هنا', history: 'السجل' },
+};
+function setUiLang(lang) {
+  STATE.uiLang = lang;
+  localStorage.setItem('iris_lang', lang);
+  const s = UI_STRINGS[lang] || UI_STRINGS.en;
+  const uploadTitle = document.querySelector('.upload-title');
+  if (uploadTitle) uploadTitle.textContent = s.upload;
+  const step4Btn = document.getElementById('step4Next');
+  if (step4Btn) step4Btn.textContent = s.analyze;
+  const sn7 = document.getElementById('sn7');
+  if (sn7) sn7.querySelector('span').textContent = s.history;
+}
+
+// ── KEYBOARD SHORTCUTS ───────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  const k = e.key.toLowerCase();
+  if (k === 's') openSettings();
+  if (k === 'h') goStep(7);
+  if (k === 'c') openChat();
+  if (k === 'p') openPalette();
+  if (k === 'a') openAnnotate();
+  if (k === 'v') openCompare();
+  if (k === 'e') openExportModal();
+  if (k === 'escape') {
+    closeSettings();
+    closeExportModal();
+    closeFullscreen();
+    document.getElementById('comparePanel').style.display = 'none';
+    document.getElementById('chatPanel').style.display = 'none';
+    document.getElementById('palettePanel').style.display = 'none';
+    document.getElementById('annotatePanel').style.display = 'none';
+  }
+});
+
+// ── BUTTON RIPPLE EFFECT ─────────────────────────────────────────────
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn');
+  if (!btn) return;
+  const r = document.createElement('span');
+  r.className = 'ripple';
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+  btn.appendChild(r);
+  setTimeout(() => r.remove(), 600);
+});
+
+// ── FULLSCREEN VIEWER ────────────────────────────────────────────────
+function openFullscreen() {
+  if (!STATE.uploadedDataUrl) return;
+  document.getElementById('fvImg').src = STATE.uploadedDataUrl;
+  document.getElementById('fvInfo').textContent = (STATE.uploadedFile?.name || 'Image') + ' · Click ✕ to close';
+  document.getElementById('fullscreenViewer').classList.add('open');
+}
+function closeFullscreen() { document.getElementById('fullscreenViewer').classList.remove('open'); }
+document.addEventListener('click', e => {
+  const v = document.getElementById('fullscreenViewer');
+  if (e.target === v) closeFullscreen();
+});
+
+// ── CHAT (Ask AI) ────────────────────────────────────────────────────
+function openChat() {
+  document.getElementById('chatPanel').style.display = 'block';
+  document.getElementById('chatPanel').scrollIntoView({ behavior: 'smooth' });
+}
+function clearChat() {
+  document.getElementById('chatMessages').innerHTML = '<div class="chat-msg ai">👋 Hi! I\'m IRIS AI. Upload an image and I can answer any question about it.</div>';
+}
+function sendQuickPrompt(el) {
+  document.getElementById('chatInput').value = el.textContent;
+  sendChat();
+}
+async function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  const box = document.getElementById('chatMessages');
+  box.innerHTML += `<div class="chat-msg user">${msg}</div>`;
+  const thinking = document.createElement('div');
+  thinking.className = 'chat-msg ai thinking';
+  thinking.textContent = '⏳ Thinking…';
+  box.appendChild(thinking);
+  box.scrollTop = box.scrollHeight;
+  document.getElementById('chatSendBtn').disabled = true;
+  const contextPrompt = STATE.uploadedDataUrl
+    ? `The user is looking at an image. Previous analysis summary: ${Object.entries(STATE.analysisResults).slice(0,5).map(([k,v])=>k+': '+v.text.substring(0,60)).join('; ')}
+
+User question: ${msg}
+Answer concisely in 2-3 sentences.`
+    : `User question about image analysis: ${msg}
+Answer helpfully in 2-3 sentences.`;
+  const response = await analyzeWithModel(contextPrompt, !!STATE.uploadedDataUrl);
+  thinking.remove();
+  box.innerHTML += `<div class="chat-msg ai">${response.replace(/SCORE:\s*\d+\/10/gi,'').trim()}</div>`;
+  box.scrollTop = box.scrollHeight;
+  document.getElementById('chatSendBtn').disabled = false;
+}
+
+// ── COLOUR PALETTE EXTRACTOR ─────────────────────────────────────────
+function openPalette() {
+  if (!STATE.uploadedDataUrl) { toast('⚠️ Upload an image first', 'error'); return; }
+  document.getElementById('palettePanel').style.display = 'block';
+  document.getElementById('palettePreviewImg').src = STATE.uploadedDataUrl;
+  document.getElementById('palettePanel').scrollIntoView({ behavior: 'smooth' });
+  extractPalette();
+}
+function extractPalette() {
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    const SIZE = 80;
+    canvas.width = SIZE; canvas.height = SIZE;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, SIZE, SIZE);
+    const data = ctx.getImageData(0, 0, SIZE, SIZE).data;
+    // Quantize colours
+    const buckets = {};
+    for (let i = 0; i < data.length; i += 4) {
+      const r = Math.round(data[i]/32)*32;
+      const g = Math.round(data[i+1]/32)*32;
+      const b = Math.round(data[i+2]/32)*32;
+      const key = `${r},${g},${b}`;
+      buckets[key] = (buckets[key] || 0) + 1;
+    }
+    const sorted = Object.entries(buckets).sort((a,b) => b[1]-a[1]).slice(0,12);
+    const swatchEl = document.getElementById('paletteSwatches');
+    swatchEl.innerHTML = '';
+    sorted.forEach(([rgb]) => {
+      const [r,g,b] = rgb.split(',').map(Number);
+      const hex = '#' + [r,g,b].map(n => n.toString(16).padStart(2,'0')).join('');
+      const sw = document.createElement('div');
+      sw.className = 'palette-swatch';
+      sw.style.background = hex;
+      sw.dataset.hex = hex;
+      sw.title = hex;
+      sw.onclick = () => { navigator.clipboard?.writeText(hex); flashCopy(hex); };
+      swatchEl.appendChild(sw);
+    });
+    // Harmony analysis (simple)
+    const hues = sorted.slice(0,5).map(([rgb]) => {
+      const [r,g,b] = rgb.split(',').map(n => n/255);
+      const max = Math.max(r,g,b), min = Math.min(r,g,b);
+      if (max === min) return 0;
+      let h = max === r ? (g-b)/(max-min) : max === g ? 2+(b-r)/(max-min) : 4+(r-g)/(max-min);
+      return ((h*60)+360)%360;
+    });
+    const spread = Math.max(...hues) - Math.min(...hues);
+    let harmony = spread < 30 ? '🎨 Monochromatic — cohesive and unified palette' :
+                  spread < 80 ? '🌈 Analogous — warm flowing colour relationship' :
+                  spread < 160 ? '⚡ Complementary — high contrast, dynamic energy' :
+                                 '🔮 Triadic / Split — vibrant and complex palette';
+    document.getElementById('harmonyResult').textContent = harmony;
+    // Draw tone bar chart
+    const tc = document.getElementById('toneChart');
+    const tctx = tc.getContext('2d');
+    tctx.clearRect(0, 0, tc.width, tc.height);
+    const topN = sorted.slice(0,8);
+    const maxCount = Math.max(...topN.map(([,c])=>c));
+    topN.forEach(([rgb, count], i) => {
+      const [r,g,b] = rgb.split(',').map(Number);
+      const x = i * (tc.width / topN.length);
+      const barW = tc.width / topN.length - 4;
+      const barH = (count / maxCount) * (tc.height - 16);
+      tctx.fillStyle = `rgb(${r},${g},${b})`;
+      tctx.fillRect(x + 2, tc.height - barH - 8, barW, barH);
+    });
+    STATE.extractedPalette = sorted.map(([rgb]) => {
+      const [r,g,b] = rgb.split(',').map(Number);
+      return '#' + [r,g,b].map(n => n.toString(16).padStart(2,'0')).join('');
+    });
+  };
+  img.src = STATE.uploadedDataUrl;
+}
+function copyPaletteCSS() {
+  if (!STATE.extractedPalette) return;
+  const css = STATE.extractedPalette.map((hex, i) => `  --iris-color-${i+1}: ${hex};`).join('\n');
+  const full = `:root {\n${css}\n}`;
+  navigator.clipboard?.writeText(full);
+  flashCopy('CSS vars copied!');
+}
+function downloadPalette() {
+  if (!STATE.extractedPalette) return;
+  const content = STATE.extractedPalette.join('\n');
+  downloadBlob(content, 'iris-palette.txt', 'text/plain');
+}
+
+// ── ANNOTATION CANVAS ────────────────────────────────────────────────
+let ANNOT = { tool: 'rect', drawing: false, startX: 0, startY: 0, history: [], color: '#00e5ff', width: 2 };
+function openAnnotate() {
+  if (!STATE.uploadedDataUrl) { toast('⚠️ Upload an image first', 'error'); return; }
+  document.getElementById('annotatePanel').style.display = 'block';
+  document.getElementById('annotatePanel').scrollIntoView({ behavior: 'smooth' });
+  initAnnotCanvas();
+}
+function initAnnotCanvas() {
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.getElementById('annotCanvas');
+    const maxW = Math.min(img.width, 800);
+    const scale = maxW / img.width;
+    canvas.width = maxW;
+    canvas.height = img.height * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    ANNOT.baseImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    ANNOT.history = [];
+    setupAnnotEvents(canvas);
+  };
+  img.src = STATE.uploadedDataUrl;
+}
+function setAnnotTool(tool, btn) {
+  ANNOT.tool = tool;
+  document.querySelectorAll('.annot-tool-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function setupAnnotEvents(canvas) {
+  const ctx = canvas.getContext('2d');
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const cl = e.touches ? e.touches[0] : e;
+    return { x: (cl.clientX - rect.left) * scaleX, y: (cl.clientY - rect.top) * scaleY };
+  }
+  canvas.onmousedown = canvas.ontouchstart = e => {
+    e.preventDefault();
+    ANNOT.drawing = true;
+    const pos = getPos(e);
+    ANNOT.startX = pos.x; ANNOT.startY = pos.y;
+    ANNOT.color = document.getElementById('annotColor').value;
+    ANNOT.width = +document.getElementById('annotWidth').value;
+    if (ANNOT.tool === 'free' || ANNOT.tool === 'erase') {
+      ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
+    }
+    ANNOT.history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+  };
+  canvas.onmousemove = canvas.ontouchmove = e => {
+    e.preventDefault();
+    if (!ANNOT.drawing) return;
+    const pos = getPos(e);
+    ctx.strokeStyle = ANNOT.tool === 'erase' ? '#000' : ANNOT.color;
+    ctx.lineWidth = ANNOT.tool === 'erase' ? ANNOT.width * 4 : ANNOT.width;
+    ctx.lineCap = 'round';
+    if (ANNOT.tool === 'free') {
+      ctx.lineTo(pos.x, pos.y); ctx.stroke();
+    } else if (ANNOT.tool === 'erase') {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineTo(pos.x, pos.y); ctx.stroke();
+      ctx.globalCompositeOperation = 'source-over';
+    } else {
+      // Preview: restore last saved state then draw preview
+      if (ANNOT.history.length) ctx.putImageData(ANNOT.history[ANNOT.history.length-1], 0, 0);
+      ctx.beginPath();
+      ctx.strokeStyle = ANNOT.color; ctx.lineWidth = ANNOT.width;
+      if (ANNOT.tool === 'rect') {
+        ctx.strokeRect(ANNOT.startX, ANNOT.startY, pos.x - ANNOT.startX, pos.y - ANNOT.startY);
+      } else if (ANNOT.tool === 'arrow') {
+        ctx.moveTo(ANNOT.startX, ANNOT.startY); ctx.lineTo(pos.x, pos.y); ctx.stroke();
+        // Arrowhead
+        const angle = Math.atan2(pos.y - ANNOT.startY, pos.x - ANNOT.startX);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+        ctx.lineTo(pos.x - 14 * Math.cos(angle - 0.4), pos.y - 14 * Math.sin(angle - 0.4));
+        ctx.lineTo(pos.x - 14 * Math.cos(angle + 0.4), pos.y - 14 * Math.sin(angle + 0.4));
+        ctx.closePath(); ctx.fillStyle = ANNOT.color; ctx.fill();
+      }
+    }
+  };
+  canvas.onmouseup = canvas.ontouchend = e => {
+    if (!ANNOT.drawing) return;
+    ANNOT.drawing = false;
+    if (ANNOT.tool === 'text') {
+      const pos = getPos(e);
+      const txt = prompt('Enter annotation text:');
+      if (txt) {
+        ctx.font = `${14 + ANNOT.width * 2}px Space Mono, monospace`;
+        ctx.fillStyle = ANNOT.color;
+        ctx.fillText(txt, ANNOT.startX, ANNOT.startY);
+      }
+    }
+    ctx.beginPath();
+  };
+}
+function undoAnnot() {
+  if (!ANNOT.history.length) return;
+  const canvas = document.getElementById('annotCanvas');
+  canvas.getContext('2d').putImageData(ANNOT.history.pop(), 0, 0);
+}
+function clearAnnot() {
+  const canvas = document.getElementById('annotCanvas');
+  const ctx = canvas.getContext('2d');
+  if (ANNOT.baseImage) ctx.putImageData(ANNOT.baseImage, 0, 0);
+  ANNOT.history = [];
+}
+function saveAnnotImage() {
+  const canvas = document.getElementById('annotCanvas');
+  const link = document.createElement('a');
+  link.download = 'iris-annotated.png';
+  link.href = canvas.toDataURL();
+  link.click();
+  toast('✅ Annotated image saved!', 'success');
+}
+
+// ── COMPARE MODE ─────────────────────────────────────────────────────
+const COMPARE = { A: null, B: null };
+function openCompare() {
+  document.getElementById('comparePanel').style.display = 'block';
+  document.getElementById('comparePanel').scrollIntoView({ behavior: 'smooth' });
+}
+function loadCompareSlot(slot) {
+  document.getElementById('compareFile' + slot).click();
+}
+function processCompareFile(slot, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    COMPARE[slot] = e.target.result;
+    const slotEl = document.getElementById('compareSlot' + slot);
+    slotEl.innerHTML = `<img src="${e.target.result}" style="max-height:180px;border-radius:8px;object-fit:contain">`;
+    slotEl.classList.add('loaded');
+    if (COMPARE.A && COMPARE.B) document.getElementById('compareRunBtn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+async function runComparison() {
+  if (!COMPARE.A || !COMPARE.B) return;
+  document.getElementById('compareResults').innerHTML = '<div style="color:var(--accent);font-family:\'Space Mono\',monospace;font-size:0.8rem;padding:1rem">⏳ Analyzing both images…</div>';
+  const params = ['Primary Subject','Dominant Colors','Overall Mood','Sharpness/Focus','Lighting Analysis','Commercial Viability'];
+  const results = { A: {}, B: {} };
+  for (const p of params) {
+    const prompt = `Analyze "${p}" in this image. Reply in 1 sentence then SCORE: X/10`;
+    const origUrl = STATE.uploadedDataUrl;
+    STATE.uploadedDataUrl = COMPARE.A;
+    results.A[p] = await analyzeWithModel(prompt, true);
+    STATE.uploadedDataUrl = COMPARE.B;
+    results.B[p] = await analyzeWithModel(prompt, true);
+    STATE.uploadedDataUrl = origUrl;
+    await delay(2000);
+  }
+  let html = '';
+  params.forEach(p => {
+    const scoreA = parseFloat((results.A[p].match(/SCORE:\s*(\d+)/i)||[,5])[1]);
+    const scoreB = parseFloat((results.B[p].match(/SCORE:\s*(\d+)/i)||[,5])[1]);
+    const cleanA = results.A[p].replace(/SCORE:\s*\d+\/10/gi,'').trim();
+    const cleanB = results.B[p].replace(/SCORE:\s*\d+\/10/gi,'').trim();
+    html += `<div class="compare-result-row">
+      <div class="compare-cell ${scoreA >= scoreB ? 'compare-winner' : 'compare-loser'}">
+        <div class="compare-label">A · ${p}</div>
+        <div style="font-size:0.8rem;margin-bottom:6px">${cleanA.substring(0,100)}</div>
+        <span style="font-family:'Space Mono',monospace;color:var(--accent);font-size:0.75rem">${scoreA}/10</span>
+      </div>
+      <div style="display:flex;align-items:center;font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--text3);padding:0 6px">vs</div>
+      <div class="compare-cell ${scoreB > scoreA ? 'compare-winner' : 'compare-loser'}">
+        <div class="compare-label">B · ${p}</div>
+        <div style="font-size:0.8rem;margin-bottom:6px">${cleanB.substring(0,100)}</div>
+        <span style="font-family:'Space Mono',monospace;color:var(--accent2);font-size:0.75rem">${scoreB}/10</span>
+      </div>
+    </div>`;
+  });
+  document.getElementById('compareResults').innerHTML = html;
+  toast('⚖️ Comparison complete!', 'success');
+}
+
+// ── ANALYSIS HISTORY ─────────────────────────────────────────────────
+function saveToHistory() {
+  if (!SETTINGS.autoSave) return;
+  const history = JSON.parse(localStorage.getItem('iris_history') || '[]');
+  const entry = {
+    id: Date.now(),
+    name: STATE.uploadedFile?.name || 'Image',
+    thumb: STATE.uploadedDataUrl ? STATE.uploadedDataUrl.substring(0, 200) : null,
+    fullThumb: STATE.uploadedDataUrl,
+    model: STATE.selectedModel,
+    params: Array.from(STATE.selectedParams),
+    results: STATE.analysisResults,
+    apiCalls: STATE.apiCallCount,
+    tokens: STATE.tokenCount,
+    timestamp: new Date().toISOString(),
+  };
+  history.unshift(entry);
+  // Keep last 50 entries
+  localStorage.setItem('iris_history', JSON.stringify(history.slice(0, 50)));
+}
+function renderHistory() {
+  const history = JSON.parse(localStorage.getItem('iris_history') || '[]');
+  const search = (document.getElementById('historySearch')?.value || '').toLowerCase();
+  const filtered = history.filter(e =>
+    e.name.toLowerCase().includes(search) ||
+    e.params.some(p => p.toLowerCase().includes(search))
+  );
+  const list = document.getElementById('historyList');
+  if (!list) return;
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="history-empty">📭 No history found<br><span style="font-size:0.75rem">Complete an analysis to see it here</span></div>';
+    return;
+  }
+  list.innerHTML = filtered.map(e => {
+    const d = new Date(e.timestamp);
+    const scores = Object.values(e.results || {}).map(r => r.score || 0);
+    const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length*10) : 0;
+    return `<div class="history-item" onclick="reloadHistoryEntry('${e.id}')">
+      <div style="width:56px;height:56px;border-radius:8px;background:var(--bg);border:1px solid var(--border);overflow:hidden;flex-shrink:0">
+        ${e.fullThumb ? `<img src="${e.fullThumb}" style="width:100%;height:100%;object-fit:cover">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem">🖼️</div>'}
+      </div>
+      <div class="history-info">
+        <div class="history-name">${e.name}</div>
+        <div class="history-meta">${d.toLocaleDateString()} ${d.toLocaleTimeString()} · ${e.model?.toUpperCase()} · ${e.params?.length || 0} params · ${avg}% confidence</div>
+        <div class="history-tags">
+          ${(e.params || []).slice(0,5).map(p => `<span class="history-tag">${p}</span>`).join('')}
+          ${e.params?.length > 5 ? `<span class="history-tag">+${e.params.length-5}</span>` : ''}
+        </div>
+      </div>
+      <div class="history-actions">
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();downloadHistoryEntry('${e.id}')">⬇️</button>
+        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteHistoryEntry('${e.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+  // Update stats
+  const totalParams = history.reduce((a,e) => a + (e.params?.length||0), 0);
+  const allScores = history.flatMap(e => Object.values(e.results||{}).map(r=>r.score||0));
+  const globalAvg = allScores.length ? Math.round(allScores.reduce((a,b)=>a+b,0)/allScores.length*10) : 0;
+  const modelCounts = {};
+  history.forEach(e => { modelCounts[e.model] = (modelCounts[e.model]||0) + 1; });
+  const favModel = Object.entries(modelCounts).sort((a,b)=>b[1]-a[1])[0]?.[0] || '—';
+  document.getElementById('hsTotalRuns').textContent = history.length;
+  document.getElementById('hsTotalParams').textContent = totalParams;
+  document.getElementById('hsAvgScore').textContent = globalAvg + '%';
+  document.getElementById('hsFavModel').textContent = favModel?.toUpperCase() || '—';
+}
+function reloadHistoryEntry(id) {
+  const history = JSON.parse(localStorage.getItem('iris_history') || '[]');
+  const entry = history.find(e => String(e.id) === String(id));
+  if (!entry) return;
+  STATE.analysisResults = entry.results || {};
+  toast('📂 History entry loaded into results', 'success');
+}
+function downloadHistoryEntry(id) {
+  const history = JSON.parse(localStorage.getItem('iris_history') || '[]');
+  const entry = history.find(e => String(e.id) === String(id));
+  if (!entry) return;
+  downloadBlob(JSON.stringify(entry, null, 2), `iris-${entry.name}-${id}.json`, 'application/json');
+}
+function deleteHistoryEntry(id) {
+  let history = JSON.parse(localStorage.getItem('iris_history') || '[]');
+  history = history.filter(e => String(e.id) !== String(id));
+  localStorage.setItem('iris_history', JSON.stringify(history));
+  renderHistory();
+  toast('🗑️ Entry deleted', 'info');
+}
+function clearAllHistory() {
+  if (!confirm('Delete all analysis history? This cannot be undone.')) return;
+  localStorage.removeItem('iris_history');
+  renderHistory();
+  toast('🗑️ History cleared', 'info');
+}
+function exportAllHistory() {
+  const history = localStorage.getItem('iris_history') || '[]';
+  downloadBlob(history, 'iris-history-export.json', 'application/json');
+}
+function importHistory() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json';
+  inp.onchange = e => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (Array.isArray(data)) {
+          const existing = JSON.parse(localStorage.getItem('iris_history') || '[]');
+          localStorage.setItem('iris_history', JSON.stringify([...data, ...existing].slice(0,50)));
+          renderHistory();
+          toast('📂 History imported!', 'success');
+        }
+      } catch { toast('❌ Invalid history file', 'error'); }
+    };
+    reader.readAsText(e.target.files[0]);
+  };
+  inp.click();
+}
+
+// ── EXPORT FORMATS ───────────────────────────────────────────────────
+function openExportModal() {
+  document.getElementById('exportModalBg').classList.add('open');
+}
+function closeExportModal(e) {
+  if (!e || e.target === document.getElementById('exportModalBg'))
+    document.getElementById('exportModalBg').classList.remove('open');
+}
+function exportMarkdown() {
+  if (!Object.keys(STATE.analysisResults).length) { toast('⚠️ No results yet', 'error'); return; }
+  let md = `# IRIS Analysis Report\n\n`;
+  md += `**Image:** ${STATE.uploadedFile?.name || 'Image'}  \n`;
+  md += `**Date:** ${new Date().toLocaleString()}  \n`;
+  md += `**Model:** ${STATE.selectedModel?.toUpperCase()}  \n`;
+  md += `**Parameters:** ${STATE.selectedParams.size}\n\n---\n\n`;
+  for (const [param, result] of Object.entries(STATE.analysisResults)) {
+    md += `### ${param}\n${result.text.replace(/SCORE:\s*\d+\/10/gi,'').trim()}\n\n> **Score:** ${result.score?.toFixed(1) || '?'}/10\n\n`;
+  }
+  if (STATE.webSources && STATE.webSources.length) {
+    md += `---\n\n## Web Sources\n\n`;
+    STATE.webSources.forEach(s => { md += `- [${s.name}](${s.url}) — ${s.desc}\n`; });
+  }
+  downloadBlob(md, 'iris-report.md', 'text/markdown');
+  toast('📝 Markdown exported!', 'success');
+}
+function exportCSV() {
+  if (!Object.keys(STATE.analysisResults).length) { toast('⚠️ No results yet', 'error'); return; }
+  const rows = [['Parameter', 'Analysis', 'Score', 'Category']];
+  for (const [param, result] of Object.entries(STATE.analysisResults)) {
+    const clean = result.text.replace(/SCORE:\s*\d+\/10/gi,'').replace(/"/g,"'").trim();
+    const cat = Object.entries(PARAM_CATEGORIES).find(([,v]) => v.includes(param))?.[0] || 'Other';
+    rows.push([param, clean, result.score?.toFixed(1) || '', cat]);
+  }
+  const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  downloadBlob(csv, 'iris-analysis.csv', 'text/csv');
+  toast('📊 CSV exported!', 'success');
+}
+function exportHTML() {
+  if (!Object.keys(STATE.analysisResults).length) { toast('⚠️ No results yet', 'error'); return; }
+  const thumb = STATE.uploadedDataUrl ? `<img src="${STATE.uploadedDataUrl}" style="max-width:300px;border-radius:8px;margin-bottom:1rem">` : '';
+  let body = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>IRIS Report</title>
+<style>body{font-family:system-ui,sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;background:#050810;color:#e2e8f0}
+h1{color:#00e5ff}h2{color:#94a3b8;font-size:1rem;margin-top:2rem}
+.r{background:#0b1020;border:1px solid #1e2d4a;border-radius:8px;padding:1rem;margin-bottom:10px}
+.rn{color:#00e5ff;font-size:0.75rem;text-transform:uppercase;margin-bottom:4px}
+.rt{font-size:0.88rem;line-height:1.6}
+.rs{display:inline-block;margin-top:6px;background:#7c3aed;color:#fff;border-radius:4px;padding:2px 8px;font-size:0.72rem}
+</style></head><body>
+<h1>🔬 IRIS Analysis Report</h1>
+${thumb}
+<p style="color:#64748b">Image: ${STATE.uploadedFile?.name || '—'} · ${new Date().toLocaleString()} · Model: ${STATE.selectedModel?.toUpperCase()}</p>`;
+  for (const [param, result] of Object.entries(STATE.analysisResults)) {
+    const clean = result.text.replace(/SCORE:\s*\d+\/10/gi,'').trim();
+    body += `<div class="r"><div class="rn">${param}</div><div class="rt">${clean}</div><span class="rs">${result.score?.toFixed(1)||'?'}/10</span></div>`;
+  }
+  body += '</body></html>';
+  downloadBlob(body, 'iris-report.html', 'text/html');
+  toast('🌐 HTML report exported!', 'success');
+}
+
+// ── DONE STEP DASHBOARD ──────────────────────────────────────────────
+function populateDoneDashboard() {
+  const results = STATE.analysisResults;
+  const entries = Object.entries(results);
+  if (!entries.length) return;
+  const scores = entries.map(([,v]) => v.score || 0);
+  const avg = scores.reduce((a,b)=>a+b,0) / scores.length;
+  const top = entries.sort((a,b) => (b[1].score||0) - (a[1].score||0))[0];
+  document.getElementById('doneParamCount').textContent = STATE.selectedParams.size;
+  document.getElementById('doneAvgScore').textContent = Math.round(avg * 10) + '%';
+  document.getElementById('doneTopScore').textContent = (top[1].score||0).toFixed(1);
+  document.getElementById('doneTopParam').textContent = top[0];
+  document.getElementById('doneApiCalls').textContent = STATE.apiCallCount;
+  document.getElementById('doneTokenCount').textContent = '~' + STATE.tokenCount.toLocaleString() + ' tokens';
+  // Sentiment needle (based on avg score)
+  const needlePct = Math.round((avg / 10) * 100);
+  document.getElementById('sentimentNeedle').style.left = needlePct + '%';
+  // Top 5 param bars
+  const top5 = Object.entries(results).sort((a,b) => (b[1].score||0) - (a[1].score||0)).slice(0,5);
+  document.getElementById('doneTopParams').innerHTML = top5.map(([name, r]) => `
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:120px;font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</div>
+      <div style="flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden">
+        <div style="width:${(r.score||0)*10}%;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px"></div>
+      </div>
+      <div style="font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--accent);width:36px;text-align:right">${(r.score||0).toFixed(1)}</div>
+    </div>`).join('');
+  // Keyword cloud
+  const allText = Object.values(results).map(r => r.text || '').join(' ').toLowerCase();
+  const stopwords = new Set(['the','a','an','is','in','of','and','to','this','with','for','that','it','as','are','was','be','has','by','at','from','have','on','or','not','but','they','its','than','more','also','image','shows','can','very','appears','seem','appear','quite']);
+  const wordFreq = {};
+  allText.replace(/[^a-z\s]/g,'').split(/\s+/).forEach(w => {
+    if (w.length > 3 && !stopwords.has(w)) wordFreq[w] = (wordFreq[w]||0) + 1;
+  });
+  const topWords = Object.entries(wordFreq).sort((a,b)=>b[1]-a[1]).slice(0,20);
+  const maxFreq = topWords[0]?.[1] || 1;
+  const colors = ['var(--accent)','var(--accent2)','var(--green)','var(--accent3)','#a78bfa'];
+  document.getElementById('keywordCloud').innerHTML = topWords.map(([word, freq], i) => {
+    const size = 0.7 + (freq / maxFreq) * 0.8;
+    const color = colors[i % colors.length];
+    return `<span class="cloud-tag" style="font-size:${size}rem;color:${color};border-color:${color}33;background:${color}11">${word}</span>`;
+  }).join('');
+}
+
+// ── ENHANCED PROCESS FILE (add EXIF display + enable new btns) ───────
+const _origProcessFile = processFile;
+function processFile(file) {
+  _origProcessFile(file);
+  setTimeout(() => {
+    // Enable new step-2 buttons
+    ['paletteBtn','annotBtn','fsBtn'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = false;
+    });
+    // Show EXIF card after extracting
+    extractEXIF().then(exif => {
+      if (!exif) return;
+      const card = document.getElementById('exifCard');
+      const disp = document.getElementById('exifDisplay');
+      if (!card || !disp) return;
+      const fields = [
+        { label: '📷 Camera', val: exif.camera },
+        { label: '⏱ Exposure', val: exif.exposure },
+        { label: '🔆 f-Stop', val: exif.fStop },
+        { label: '📡 ISO', val: exif.iso },
+        { label: '🔭 Focal', val: exif.focal },
+        { label: '📅 Taken', val: exif.dateTaken },
+        { label: '📍 GPS', val: exif.gps ? `${exif.gps.lat.toFixed(4)}, ${exif.gps.lng.toFixed(4)}` : null },
+      ].filter(f => f.val);
+      if (fields.length) {
+        card.style.display = 'block';
+        disp.innerHTML = fields.map(f => `<div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px">
+          <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--text3)">${f.label}</div>
+          <div style="font-size:0.78rem;margin-top:2px">${f.val}</div>
+        </div>`).join('');
+      }
+    });
+    // Show image diagnostics
+    const img = new Image();
+    img.onload = () => {
+      const diagCard = document.getElementById('imageInfoCard');
+      const diagDisp = document.getElementById('imageDiagDisplay');
+      if (!diagCard || !diagDisp) return;
+      diagCard.style.display = 'block';
+      const diags = [
+        { label: '📐 Dimensions', val: `${img.width} × ${img.height}px` },
+        { label: '📊 Aspect Ratio', val: (img.width/img.height).toFixed(2) + ':1' },
+        { label: '🗜 File Size', val: STATE.uploadedFile ? (STATE.uploadedFile.size/1024).toFixed(0) + ' KB' : '—' },
+        { label: '📁 Format', val: STATE.uploadedFile?.type || '—' },
+        { label: '🎯 Megapixels', val: ((img.width * img.height)/1e6).toFixed(1) + ' MP' },
+        { label: '🔲 Orientation', val: img.width > img.height ? 'Landscape' : img.width < img.height ? 'Portrait' : 'Square' },
+      ];
+      diagDisp.innerHTML = diags.map(d => `<div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px">
+        <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--text3)">${d.label}</div>
+        <div style="font-size:0.78rem;margin-top:2px">${d.val}</div>
+      </div>`).join('');
+    };
+    img.src = STATE.uploadedDataUrl;
+  }, 600);
+}
+
+// ── ENHANCED ANALYSIS: show floating toolbar, save history ────────────
+const _origStartAnalysis = startAnalysis;
+async function startAnalysis() {
+  await _origStartAnalysis();
+  // After analysis completes
+  setTimeout(() => {
+    document.getElementById('floatToolbar').style.display = 'flex';
+    saveToHistory();
+    populateDoneDashboard();
+  }, 500);
+}
+
+// ── COPY FLASH HELPER ────────────────────────────────────────────────
+function flashCopy(msg = 'Copied!') {
+  const el = document.createElement('div');
+  el.className = 'copy-flash';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1300);
+}
+
+// ── ENHANCED PARAM RESULT with copy button ───────────────────────────
+const _origRenderParamResult = renderParamResult;
+function renderParamResult(param, result) {
+  const base = _origRenderParamResult(param, result);
+  const withActions = base.replace('</div>', `
+    <div class="param-result-actions">
+      <button class="pra-btn" onclick="copyParamResult('${param.replace(/'/g,'\\\'')}')" title="Copy to clipboard">📋 Copy</button>
+      <button class="pra-btn" onclick="sendParamToChat('${param.replace(/'/g,'\\\'')}')" title="Ask AI more">💬 Ask more</button>
+    </div>
+  </div>`);
+  return withActions;
+}
+function copyParamResult(param) {
+  const r = STATE.analysisResults[param];
+  if (!r) return;
+  navigator.clipboard?.writeText(`${param}: ${r.text}`);
+  flashCopy('Copied!');
+}
+function sendParamToChat(param) {
+  const r = STATE.analysisResults[param];
+  if (!r) return;
+  openChat();
+  document.getElementById('chatInput').value = `Tell me more about: ${param}`;
+  sendChat();
+}
+
+// ── BATCH IMPORT via drag on upload zone (multi-file) ────────────────
+const uploadZoneEl = document.getElementById('uploadZone');
+if (uploadZoneEl) {
+  uploadZoneEl.addEventListener('drop', e => {
+    if (e.dataTransfer.files.length > 1) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      toast(`📦 ${e.dataTransfer.files.length} files detected. Processing first image — batch mode coming soon!`, 'info');
+      processFile(e.dataTransfer.files[0]);
+    }
+  }, true);
+}
+
+// ── INIT ALL NEW FEATURES ────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  startClock();
+  loadTheme();
+  loadSettings();
+  renderHistory();
+  // Restore language
+  const savedLang = localStorage.getItem('iris_lang');
+  if (savedLang) {
+    document.getElementById('uiLang').value = savedLang;
+    setUiLang(savedLang);
+  }
+  // Init canvas size for annotate panel (lazy)
+});
+
 </script>
 </body>
 </html>
