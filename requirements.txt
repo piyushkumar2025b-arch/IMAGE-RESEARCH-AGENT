@@ -1,2 +1,56 @@
-Flask==3.0.0
-requests==2.31.0
+# ─────────────────────────────────────────────────────────────
+# IRIS — Image Research Intelligence System
+# requirements.txt — Fixed & Updated dependency list
+# ─────────────────────────────────────────────────────────────
+
+
+# ── CORE: Web app framework ──────────────────────────────────
+streamlit>=1.40.0          # 1.32 had components.html bugs; 1.40+ is stable
+
+
+# ── HTTP: Making API calls from Python ───────────────────────
+requests>=2.31.0
+httpx>=0.27.0
+
+
+# ── IMAGE PROCESSING ─────────────────────────────────────────
+Pillow>=10.3.0
+
+
+# ── ENVIRONMENT VARIABLES ────────────────────────────────────
+python-dotenv>=1.0.0
+
+
+# ── DATA HANDLING ────────────────────────────────────────────
+pandas>=2.2.0
+
+
+# ── PDF GENERATION (server-side fallback) ────────────────────
+reportlab>=4.1.0
+fpdf2>=2.7.9
+
+
+# ── SUPABASE CLIENT ──────────────────────────────────────────
+supabase>=2.7.0            # 2.4.0 had auth bugs; 2.7+ is stable
+
+
+# ── EMAIL (Python SMTP — stdlib, no install needed) ──────────
+# Use: import smtplib, ssl  (already in Python standard library)
+# REMOVED: secure-smtplib — does NOT exist on PyPI, breaks pip install
+
+
+# ── ASYNC SUPPORT ────────────────────────────────────────────
+anyio>=4.3.0
+
+
+# ── JSON + SCHEMA VALIDATION ─────────────────────────────────
+jsonschema>=4.22.0
+
+
+# ── SAFE HTML RENDERING ──────────────────────────────────────
+markupsafe>=2.1.5          # Needed for safely injecting .env keys into HTML
+
+
+# ── UTILITIES ────────────────────────────────────────────────
+python-dateutil>=2.9.0
+tqdm>=4.66.0

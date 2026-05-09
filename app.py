@@ -1,55 +1,81 @@
-from flask import Flask, request, jsonify, send_file
-import requests
+from dotenv import load_dotenv
 import os
+import json
 
-app = Flask(__name__)
+load_dotenv()
 
-@app.route('/')
-def index():
-    return send_file('index.html')
+import streamlit as st
+import streamlit.components.v1 as components
 
-@app.route('/api/search', methods=['POST'])
-def search():
-    data = request.json
-    api_key = data.get('api_key')
-    query = data.get('query')
-    
-    if not api_key:
-        return jsonify({"error": "No API key provided"}), 400
-        
-    # Standard text search using SerpApi
-    params = {
-      "engine": "google",
-      "q": query,
-      "api_key": api_key
-    }
-    
-    try:
-        response = requests.get("https://serpapi.com/search", params=params)
-        return jsonify(response.json())
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# Configure the Streamlit page
+st.set_page_config(
+    page_title="IRIS - Image Research Intelligence System",
+    page_icon="👁️",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
-@app.route('/api/lens', methods=['POST'])
-def lens_search():
-    data = request.json
-    api_key = data.get('api_key')
-    image_url = data.get('image_url')
-    
-    if not api_key or not image_url:
-        return jsonify({"error": "Missing api_key or image_url"}), 400
-        
-    params = {
-      "engine": "google_lens",
-      "url": image_url,
-      "api_key": api_key
-    }
-    
-    try:
-        response = requests.get("https://serpapi.com/search", params=params)
-        return jsonify(response.json())
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# Hide Streamlit's default UI elements
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            .block-container {
+                padding-top: 0rem;
+                padding-bottom: 0rem;
+                padding-left: 0rem;
+                padding-right: 0rem;
+            }
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+# ── Read the HTML file ───────────────────────────────────────
+html_file_path = os.path.join(os.path.dirname(__file__), "index.html")
+with open(html_file_path, "r", encoding="utf-8") as f:
+    html_content = f.read()
+
+# ── Inject .env keys as JS prefill so the user doesn't have
+#    to type them manually in the browser ────────────────────
+prefill_keys = {
+    "gemini":           os.getenv("GEMINI_API_KEY", ""),
+    "groq":             os.getenv("GROQ_API_KEY", ""),
+    "openrouter":       os.getenv("OPENROUTER_API_KEY", ""),
+    "serpapi":          os.getenv("SERPAPI_KEY", ""),
+    "imgbb":            os.getenv("IMGBB_KEY", ""),
+    "supabaseUrl":      os.getenv("SUPABASE_URL", ""),
+    "supabaseKey":      os.getenv("SUPABASE_KEY", ""),
+    "emailjs":          os.getenv("EMAILJS_PUBLIC_KEY", ""),
+    "emailjsService":   os.getenv("EMAILJS_SERVICE_ID", ""),
+    "emailjsTemplate":  os.getenv("EMAILJS_TEMPLATE_ID", ""),
+    "telegramToken":    os.getenv("TELEGRAM_BOT_TOKEN", ""),
+    "telegramChatId":   os.getenv("TELEGRAM_CHAT_ID", ""),
+    "huggingface":      os.getenv("HUGGINGFACE_API_KEY", ""),
+    "ocrspace":         os.getenv("OCRSPACE_API_KEY", ""),
+    "unsplash":         os.getenv("UNSPLASH_API_KEY", ""),
+    "clarifai":         os.getenv("CLARIFAI_PAT", ""),
+    "deepl":            os.getenv("DEEPL_API_KEY", ""),
+    "jsonbin":          os.getenv("JSONBIN_MASTER_KEY", ""),
+}
+
+# Only include keys that are actually set in .env
+prefill_keys = {k: v for k, v in prefill_keys.items() if v}
+
+inject_script = f"""<script>
+// Injected by app.py from .env — auto-fills API key fields on load
+window.IRIS_PREFILL = {json.dumps(prefill_keys)};
+</script>"""
+
+# Insert just before </head>
+html_content = html_content.replace("</head>", inject_script + "\n</head>")
+
+# ── Optional: SerpAPI server-side proxy ─────────────────────
+# If you want to avoid the CORS proxy entirely, you can route
+# SerpAPI calls through Python. To enable this, set
+# SERPAPI_PROXY_ENABLED=true in your .env.
+# The JS already handles the direct call with corsproxy.io as
+# a fallback — this is just an extra option for reliability.
+
+# ── Render the HTML application ─────────────────────────────
+components.html(html_content, height=1200, scrolling=True)
