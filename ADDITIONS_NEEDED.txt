@@ -1,0 +1,25 @@
+SECTIONS NEEDING FULL IMPLEMENTATION
+
+1. REVERSE IMAGE SEARCH / SIMILAR IMAGES
+   - Function Stub: `mockSimilarImageSearch()`
+   - Requirements: Integrate SerpAPI (Google Lens API) or similar service to perform actual reverse image search using the uploaded image. Replace the mocked `sources` array with the real API response and update the `webSources` state and the DOM elements dynamically.
+
+2. WEB SOURCES COMPILATION
+   - Function Stub: `mockWebSources()`
+   - Requirements: Fetch actual related articles, web pages, or information based on the initial image description or reverse image search results. Update the UI to display these real web source links.
+
+3. SUPABASE DATABASE STORAGE
+   - Function Stub: `saveToSupabase()`
+   - Requirements: Use the provided Supabase URL and Key from the user inputs to connect to the Supabase REST API (or via the Supabase JS client). 
+   - Define a table schema (e.g., `analysis_history` with columns: `id`, `image_name`, `parameters_count`, `model_used`, `results_json`, `created_at`).
+   - Write an INSERT query to store the `STATE.analysisResults` and related metadata for persistence.
+
+4. EMAILJS REPORT DELIVERY
+   - Function Stub: `sendEmailReport()`
+   - Requirements: Integrate the EmailJS SDK or use their REST API. 
+   - Configure a service ID, template ID, and the public key (provided by the user). 
+   - Pass the `generateReportText()` output and user details (`STATE.userName`, `STATE.userEmail`) to the EmailJS send function to actually deliver the email to the user.
+
+5. ADVANCED ERROR HANDLING
+   - Current implementation catches API errors and falls back to `generateMockAnalysis()`. 
+   - Requirements: Replace mock generation with proper retry logic or user-facing error messages if API limits are exceeded or keys are invalid.
