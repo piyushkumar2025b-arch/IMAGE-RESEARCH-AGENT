@@ -2906,17 +2906,18 @@ async function similarImageSearch() {
     log('info', 'Querying Google Lens via SerpAPI...');
     const targetUrl = `https://serpapi.com/search?engine=google_lens&url=${encodeURIComponent(imageUrl)}&api_key=${STATE.apiKeys.serpapi}`;
     // FIX: Try multiple CORS proxies in order for reliability
-    const CORS_PROXIES = [
+    // Try server-side proxy first (Flask app.py), then CORS proxies as fallback
+    const PROXY_URLS = [
+      `/api/serpapi-lens?url=${encodeURIComponent(imageUrl)}`,
       `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
       `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
-      `https://proxy.cors.sh/${targetUrl}`,
     ];
     let resp = null;
-    for (const proxyUrl of CORS_PROXIES) {
+    for (const proxyUrl of PROXY_URLS) {
       try {
-        resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(10000) });
+        resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(12000) });
         if (resp.ok) break;
-      } catch(e) { log('warn', 'CORS proxy failed, trying next: ' + e.message); resp = null; }
+      } catch(e) { log('warn', 'Proxy failed, trying next: ' + e.message); resp = null; }
     }
     if (!resp || !resp.ok) throw new Error('SerpAPI search failed — all proxies exhausted');
     const data = await resp.json();
@@ -4281,13 +4282,14 @@ function flashCopy(msg = 'Copied!') {
 const _origRenderParamResult = renderParamResult;
 function renderParamResult(param, result) {
   const base = _origRenderParamResult(param, result);
-  const withActions = base.replace('</div>', `
-    <div class="param-result-actions">
-      <button class="pra-btn" onclick="copyParamResult('${param.replace(/'/g,'\\\'')}')" title="Copy to clipboard">📋 Copy</button>
-      <button class="pra-btn" onclick="sendParamToChat('${param.replace(/'/g,'\\\'')}')" title="Ask AI more">💬 Ask more</button>
-    </div>
-  </div>`);
-  return withActions;
+  // FIX: replace LAST </div> (closing the param-result div), not first
+  const escapedParam = param.replace(/'/g, "\'");
+  const actions = `<div class="param-result-actions">
+      <button class="pra-btn" onclick="copyParamResult('${escapedParam}')" title="Copy to clipboard">📋 Copy</button>
+      <button class="pra-btn" onclick="sendParamToChat('${escapedParam}')" title="Ask AI more">💬 Ask more</button>
+    </div>`;
+  const lastClose = base.lastIndexOf('</div>');
+  return base.substring(0, lastClose) + actions + '</div>';
 }
 function copyParamResult(param) {
   const r = STATE.analysisResults[param];
