@@ -1,27 +1,41 @@
 """
 IRIS — Image Research Intelligence System
-Standalone server — serves index.html directly (no iframe sandboxing).
+Streamlit Cloud deployment via st.iframe() + static file serving.
 
-Run:
-  pip install -r requirements.txt
-  python app.py          # runs on http://localhost:5000
-  python app.py 8501     # custom port
+Streamlit serves files in the ./static/ folder at /app/static/<filename>
+This gives a real src= iframe with no srcdoc sandbox restrictions.
+All buttons, JS, and fetch() calls work natively.
 
-Or with Streamlit (legacy):
-  streamlit run app_streamlit.py
+Run locally:  streamlit run app.py
+Deploy:       Push to GitHub → connect to share.streamlit.io
 """
-import os, json
-from flask import Flask, send_file, jsonify, request
+import os, json, shutil
 from dotenv import load_dotenv
+import streamlit as st
 
 load_dotenv()
 
-app = Flask(__name__, static_folder='.', static_url_path='')
+st.set_page_config(
+    page_title="IRIS – Image Research Intelligence System",
+    page_icon="👁️",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
 
-_script_dir = os.path.dirname(os.path.abspath(__file__))
+# ── Hide Streamlit chrome completely ─────────────────────────
+st.markdown("""<style>
+#MainMenu, footer, header, .stDeployButton, [data-testid="stToolbar"] { display:none!important; }
+.block-container { padding:0!important; margin:0!important; max-width:100%!important; }
+</style>""", unsafe_allow_html=True)
 
-# ── Build JS prefill from .env so the browser auto-fills API key fields ──
-def get_prefill_keys():
+# ── Paths ─────────────────────────────────────────────────────
+_dir      = os.path.dirname(os.path.abspath(__file__))
+_html_src = os.path.join(_dir, "index.html")
+_static   = os.path.join(_dir, "static")          # served at /app/static/
+_html_dst = os.path.join(_static, "iris.html")    # → /app/static/iris.html
+
+# ── Read .env keys for browser prefill ───────────────────────
+def _prefill():
     keys = {
         "gemini":          os.getenv("GEMINI_API_KEY", ""),
         "groq":            os.getenv("GROQ_API_KEY", ""),
@@ -44,42 +58,21 @@ def get_prefill_keys():
     }
     return {k: v for k, v in keys.items() if v}
 
-
-@app.route('/')
-def index():
-    html_path = os.path.join(_script_dir, 'index.html')
-    with open(html_path, 'r', encoding='utf-8') as f:
+# ── Build and copy HTML into ./static/ (cached, runs once) ───
+@st.cache_resource
+def _build_static():
+    os.makedirs(_static, exist_ok=True)
+    with open(_html_src, "r", encoding="utf-8") as f:
         html = f.read()
+    prefill = _prefill()
+    inject  = f"<script>\nwindow.IRIS_PREFILL = {json.dumps(prefill)};\n</script>"
+    html    = html.replace("</head>", inject + "\n</head>", 1)
+    with open(_html_dst, "w", encoding="utf-8") as f:
+        f.write(html)
+    return True
 
-    # Inject prefill keys from .env
-    prefill = get_prefill_keys()
-    inject = f'<script>\nwindow.IRIS_PREFILL = {json.dumps(prefill)};\n</script>'
-    html = html.replace('</head>', inject + '\n</head>', 1)
+_build_static()
 
-    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
-
-
-# ── Optional server-side SerpAPI proxy (avoids CORS issues entirely) ──
-@app.route('/api/serpapi-lens')
-def serpapi_proxy():
-    image_url = request.args.get('url', '')
-    api_key = os.getenv('SERPAPI_KEY', request.args.get('key', ''))
-    if not api_key:
-        return jsonify({'error': 'No SerpAPI key configured'}), 400
-    import urllib.request
-    target = f'https://serpapi.com/search?engine=google_lens&url={urllib.parse.quote(image_url)}&api_key={api_key}'
-    try:
-        import urllib.parse
-        target = f'https://serpapi.com/search?engine=google_lens&url={urllib.parse.quote(image_url)}&api_key={api_key}'
-        with urllib.request.urlopen(target, timeout=15) as r:
-            data = r.read()
-        return data, 200, {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
-    except Exception as e:
-        return jsonify({'error': str(e)}), 502
-
-
-if __name__ == '__main__':
-    import sys
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 5000
-    print(f'\n🔬 IRIS starting on http://localhost:{port}\n')
-    app.run(host='0.0.0.0', port=port, debug=False)
+# ── Render — real src= iframe, zero sandbox restrictions ─────
+# /app/static/iris.html is served by Streamlit's built-in static file server
+st.components.v1.iframe("/app/static/iris.html", height=900, scrolling=True)

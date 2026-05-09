@@ -1,14 +1,6 @@
 # IRIS — Image Research Intelligence System
-# Install: pip install -r requirements.txt
+# pip install -r requirements.txt
 
-# ── WEB SERVER ───────────────────────────────────────────────
-flask>=3.0.0
-
-# ── ENVIRONMENT VARIABLES ────────────────────────────────────
+streamlit>=1.40.0
 python-dotenv>=1.0.0
-
-# ── OPTIONAL: Streamlit (only needed for app_streamlit.py) ───
-# streamlit>=1.40.0
-
-# ── HTTP ─────────────────────────────────────────────────────
 requests>=2.31.0
